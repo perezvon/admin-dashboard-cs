@@ -113,7 +113,7 @@ app.post('/api/approve', (req, res) => {
 			to: address, // list of receivers
 			subject: 'Order Denied - Order #' + orderNumber
 		}
-			helpers.updateOrderStatus(OrderID, 9)
+			helpers.updateOrderStatus(OrderID, 'D')
 			helpers.sendEmail(address, options, order, 'denied')
 			res.send('request denied.')
 	})
