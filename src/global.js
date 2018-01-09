@@ -12,6 +12,9 @@ export function getStoreID(username) {
     case 'anokasheriff':
       return 4;
       break;
+      case 'slpfire':
+        return 7;
+        break;
     default:
       return 0;
   }
@@ -48,6 +51,12 @@ export function getCompanyInfo(id) {
           logo: '',
           maxSpend: 250
         }
+        case 7:
+          return {
+            companyName: 'St. Louis Park Fire',
+            logo: 'slpfire.jpg',
+            maxSpend: 0
+          }
     default:
       return {
         companyName: '',
