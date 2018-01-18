@@ -282,8 +282,11 @@ class App extends React.Component {
 
       //total products purchased
       totalProductCount = data.map(i => i.products)
-      totalProductCount = _.map(totalProductCount[0], i => +i.amount).reduce((a,b) => a + b);
-      productsPurchased = <h3>Total Products Purchased: <span className='green-text'>{totalProductCount}</span> </h3>
+      const numOfProducts = 0;
+      for (let i = 0; i < totalProductCount.length; i++) {
+        numOfProducts += Object.keys(totalProductCount[i]).length
+      }
+      productsPurchased = <h3>Total Products Purchased: <span className='green-text'>{numOfProducts}</span> </h3>
 
       //sort user spend data for display
       userTotals = _.sortBy(userTotals, 'total').reverse();
