@@ -182,7 +182,7 @@ class App extends React.Component {
       fetch('/api/users/' + currentId)
         .then(res => res.json())
         .then(json => this.setState({customers: json.users}))
-
+        .catch(err => console.log(err))
       }
   }
 
@@ -216,7 +216,7 @@ class App extends React.Component {
       data.forEach(i => {
         let orderNumber = i.order_id;
         let date = moment.unix(i.timestamp).format('MMMM DD, YYYY');
-        let username = i.b_firstname + ' ' + i.b_lastname;
+        let username = i.b_firstname ? i.b_firstname + ' ' + i.b_lastname : i.email;
         let shipping = +i.display_shipping_cost;
         let tax = +i.tax_subtotal;
         let total = +i.total;
@@ -242,7 +242,7 @@ class App extends React.Component {
 
       uniqueUsers.forEach(user => {
         let userName = data.filter(i=>i.user_id === user);
-        userName = userName ? userName[0].b_firstname + ' ' + userName[0].b_lastname : ''
+        userName = userName && userName[0].b_firstname ? userName[0].b_firstname + ' ' + userName[0].b_lastname : userName[0].email;
         let currentTotal = 0;
         let numOfOrders = 0;
         for (let i = 0; i < data.length; i++) {
@@ -314,11 +314,16 @@ class App extends React.Component {
       //get data for current customer
       if (this.state.activeUser) {
         userOrderData = data.filter(item => {
-          return item.firstname + ' ' + item.lastname === this.state.activeUser
+          let user = item.firstname ? item.firstname + ' ' + item.lastname : item.email
+          return user === this.state.activeUser
         }).map(item => item.products)
-          userOrderData = _.map(userOrderData[0], (item, index) => {
-            let description = item.product.split('<', 1)[0];
-            return <tr key={index}><td>{item.product_code}</td><td>{description}</td><td>${+item.price}</td><td>{item.amount}</td><td>${+(item.price * item.amount).toFixed(2)}</td></tr>
+        console.log(userOrderData)
+          userOrderData = _.map(userOrderData, (order, index) => {
+            return _.map(order, (item, index) => {
+              let description = item.product.split('<', 1)[0];
+              return <tr key={index}><td>{item.product_code}</td><td>{description}</td><td>${+item.price}</td><td>{item.amount}</td><td>${+(item.price * item.amount).toFixed(2)}</td></tr>
+
+            })
           })
     }
       userDetails = _.first(userTotals.filter(item => item.name === this.state.activeUser));
