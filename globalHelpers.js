@@ -35,7 +35,7 @@ function sendEmail(address, options, data, template) {
 }
 
 function getOrderInfo(orderID, callback) {
-  const http = require("https");
+  const http = require("http");
   const base64key = Buffer.from(process.env.REACT_APP_API_USER + ':' + process.env.REACT_APP_API_KEY, 'utf8').toString('base64')
   console.log(base64key)
   const options = {
@@ -69,7 +69,7 @@ function getOrderInfo(orderID, callback) {
 
 //currently deprecated, sending with env var QM_EMAIL instead. We'd use this if there were more than one supervisor/QM for a group.
 function checkForSupervisor(customerID, callback) {
-  const http = require("https");
+  const http = require("http");
   const base64key = Buffer.from(process.env.REACT_APP_API_USER + ':' + process.env.REACT_APP_API_KEY, 'utf8').toString('base64')
   const options = {
     "method": "GET",
@@ -115,7 +115,7 @@ function approvalNeeded(address, orderInfo) {
 }
 
 function updateOrderStatus(orderID, status, callback) {
-  const http = require("https");
+  const http = require("http");
   const base64key = Buffer.from(process.env.REACT_APP_API_USER + ':' + process.env.REACT_APP_API_KEY, 'utf8').toString('base64')
   const options = {
     "method": "PUT",

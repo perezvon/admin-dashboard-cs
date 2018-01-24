@@ -40,7 +40,7 @@ app.get('/api/users/:company', (req, res) => {
   "method": "GET",
   "hostname": url,
   "port": null,
-  "path": "/api/users?company_id=" + req.params.company,
+  "path": "/api/users?company_id=" + req.params.company + "&items_per_page=9999",
   "headers": {
     "cache-control": "no-cache",
     Authorization: 'Basic ' + base64key
@@ -58,7 +58,7 @@ app.get('/api/orders/:company/', (req, res) => {
   var options = {
   "method": "GET",
   "hostname": url,
-  "path": "/api/orders?company_id=" + req.params.company,
+  "path": "/api/orders?company_id=" + req.params.company + "&items_per_page=9999",
   "headers": {
     "cache-control": "no-cache",
     "Authorization": 'Basic ' + base64key
@@ -76,7 +76,7 @@ app.get('/api/orders/:company/:id', (req, res) => {
   var options = {
   "method": "GET",
   "hostname": url,
-  "path": "/api/orders/" + req.params.id,
+  "path": "/api/orders/" + req.params.id + "?items_per_page=9999",
   "headers": {
     "cache-control": "no-cache",
     "Authorization": 'Basic ' + base64key
