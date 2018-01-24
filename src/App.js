@@ -252,10 +252,12 @@ class App extends React.Component {
           }
         }
 
-        if (currentTotal > this.state.maxSpend) currentTotal = this.state.maxSpend;
+        if (this.state.maxSpend !== 0 && currentTotal > this.state.maxSpend) currentTotal = this.state.maxSpend;
+
+        console.log(currentTotal)
         companyTotal += currentTotal;
         totalSpendRemaining -= currentTotal;
-
+        
         userTotals.push({
           name: userName,
           orders: numOfOrders,
@@ -263,7 +265,6 @@ class App extends React.Component {
           spendRemaining: this.state.maxSpend - currentTotal
         })
       });
-
       let sortedOrders = sortCollection(orderTotals, this.state.sort, this.state.reverse);
 
       //format orders for order table
@@ -294,8 +295,8 @@ class App extends React.Component {
       chartData = userTotals.map(user => {return {'name': user.name,'total': user.total}})
       tooltipContent = chartData.map(item => {return {'name': item.name,'total': '$' + item.total.toFixed(2)}})
       //update UI
-      totalSpend = <h2>Total Spend 2017: <span className='green-text'>${companyTotal.toFixed(2)}</span></h2>
-      spendRemaining = <h2>Amount Remaining 2017: <span className='green-text'>${+totalSpendRemaining.toFixed(2)}</span></h2>
+      totalSpend = <h2>Total Spend 2018: <span className='green-text'>${companyTotal.toFixed(2)}</span></h2>
+      spendRemaining = <h2>Amount Remaining 2018: <span className='green-text'>${+totalSpendRemaining.toFixed(2)}</span></h2>
       userData = userTotals.map((user, index) => {
         const textColor = user.total <= this.state.maxSpend ? 'green-text' : 'red-text';
         return <h3 key={index}>{user.name}: <span className={textColor}>${user.total.toFixed(2)}</span></h3>
