@@ -13,6 +13,7 @@ export function getStoreID(username) {
       return 4;
       break;
       case 'slpfire':
+      case 'tsmith':
         return 7;
         break;
     default:
