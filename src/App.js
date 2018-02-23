@@ -3,6 +3,7 @@ import './App.css';
 import {Dashboard} from './Dashboard'
 import Loading from 'react-loading'
 import {MenuItem} from 'react-bootstrap'
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 import _ from 'underscore'
 import Auth0Lock from 'auth0-lock'
 import {sortCollection, getCompanyInfo, getStoreID} from './global'
@@ -90,7 +91,7 @@ class App extends React.Component {
           reverse: !reverseValue
         })
       break;
-      case 'Employee Name':
+      case 'Employee':
         this.setState({
           lastSort: this.state.sort,
           sort: 'name',
@@ -150,6 +151,25 @@ class App extends React.Component {
   handleFilter = (eventKey) => {
     this.setState({filterBy: eventKey})
   }
+  
+  approveOrDenyOrders = data => {
+    fetch('/api/approve-deny', {
+    body: JSON.stringify(data), 
+    cache: 'no-cache', 
+    credentials: 'include',
+    headers: {
+      'content-type': 'application/json'
+    },
+    method: 'POST', 
+    mode: 'same-origin', 
+  })
+      .then(res => res.json())
+      .then(json => {
+        console.log(json)
+        alert('Order Statuses Updated!')
+      })
+      .catch(err => console.error(err))
+  }
 
   componentDidMount = () => {
     if (token) {
@@ -171,18 +191,18 @@ class App extends React.Component {
                     this.setState({data: data})
                   })
                   .catch(err => {
-                    console.log(err)
+                    console.error(err)
                   })
               })
             })
         .catch(err => {
-          console.log(err)
+          console.error(err)
         })
 
       fetch('/api/users/' + currentId)
         .then(res => res.json())
         .then(json => this.setState({customers: json.users}))
-        .catch(err => console.log(err))
+        .catch(err => console.error(err))
       }
   }
 
@@ -211,7 +231,8 @@ class App extends React.Component {
     if (!_.isEmpty(this.state.data) && !_.isEmpty(this.state.customers) && this.state.loading === false) {
       const customers = this.state.filterBy !== 'all' ? this.state.customers.filter(c => c.AdditionalField2 === this.state.filterBy) : this.state.customers;
       const customerIDs = [...new Set(customers.map(item => item.user_id))]
-      const data = this.state.data.filter(i => customerIDs.indexOf(i.user_id) !== -1);
+      let data = this.state.data.filter(i => customerIDs.indexOf(i.user_id) !== -1);
+      if (this.state.approve) data = data.filter(i => i.status === 'P')
       //populate orders array
       data.forEach(i => {
         let orderNumber = i.order_id;
@@ -254,10 +275,9 @@ class App extends React.Component {
 
         if (this.state.maxSpend !== 0 && currentTotal > this.state.maxSpend) currentTotal = this.state.maxSpend;
 
-        console.log(currentTotal)
         companyTotal += currentTotal;
         totalSpendRemaining -= currentTotal;
-        
+
         userTotals.push({
           name: userName,
           orders: numOfOrders,
@@ -268,12 +288,12 @@ class App extends React.Component {
       let sortedOrders = sortCollection(orderTotals, this.state.sort, this.state.reverse);
 
       //format orders for order table
-      headers = ['Order Number', 'Order Date', 'Employee Name', 'Subtotal', 'Shipping', 'Tax', 'Total'].map((item, index) => <th key={index} data-sort={item} onClick={this.sortFactor}>{item}</th>);
+      headers = ['Order Number', 'Order Date', 'Employee', 'Subtotal', 'Shipping', 'Tax', 'Total'].map((item, index) => <th key={index} data-sort={item} onClick={this.sortFactor}>{item}</th>);
       tableData = sortedOrders.map((item, index) => {
         return <tr key={item.orderNumber} data-order={item.orderNumber} onClick={this.setActiveOrder}>{_.map(item, (i, key) => <td key={key}>{i}</td>)}</tr>
       })
       //format users for user spend table
-      userHeaders = ['Name'].map((item, index) => <th key={index} data-sort={item} onClick={this.sortFactor}>{item}</th>);
+      userHeaders = ['Employee'].map((item, index) => <th key={index} data-sort={item} onClick={this.sortFactor}>{item}</th>);
       userSpendData = _.uniq(orderTotals, 'name').map((item, index) => {
         return <tr key={item.name} data-user={item.name} onClick={this.setActiveUser}>{_.map(item, (i, key) => {return key === 'name' ? <td key={i}>{i}</td> : null})}</tr>
       })
@@ -283,7 +303,7 @@ class App extends React.Component {
 
       //total products purchased
       totalProductCount = data.map(i => i.products)
-      const numOfProducts = 0;
+      let numOfProducts = 0;
       for (let i = 0; i < totalProductCount.length; i++) {
         numOfProducts += Object.keys(totalProductCount[i]).length
       }
@@ -321,7 +341,6 @@ class App extends React.Component {
           let user = item.firstname ? item.firstname + ' ' + item.lastname : item.email
           return user === this.state.activeUser
         }).map(item => item.products)
-        console.log(userOrderData)
           userOrderData = _.map(userOrderData, (order, index) => {
             return _.map(order, (item, index) => {
               let description = item.product.split('<', 1)[0];
@@ -331,38 +350,45 @@ class App extends React.Component {
           })
     }
       userDetails = _.first(userTotals.filter(item => item.name === this.state.activeUser));
-
+      const approveOrderData = this.state.data.filter(o => o.status === 'O')
       modalData = this.state.activeOrder !== 0 ? orderData : userOrderData;
       modalTitle = this.state.activeOrder !== 0 ? 'Order #' + this.state.activeOrder : 'Shopper Profile for ' + this.state.activeUser;
-
     return (
-      <div className='container-fluid'>
-        <Dashboard
-          logo={this.state.logo}
-          companyName={companyName}
-          totalSpend={totalSpend}
-          spendRemaining={spendRemaining}
-          userData={userData}
-          userHeaders={userHeaders}
-          userSpendData={userSpendData}
-          totalOrders={totalOrders}
-          productsPurchased={productsPurchased}
-          chartData={chartData}
-          tooltipContent={tooltipContent}
-          headers={headers}
-          tableData={tableData}
-          modalTitle={modalTitle}
-          modalData={modalData}
-          userDetails={userDetails}
-          showModal={this.state.showModal}
-          openModal={this.openModal}
-          closeModal={this.closeModal}
-          filter={this.state.filter}
-          dropdownItems={dropdownItems}
-          handleFilter={this.handleFilter}
-          logout={this.logout}
-        />
-      </div>
+      <Router>
+        <div className='container-fluid'>
+          <Switch>
+            <Route path='/' render={()=> <Dashboard
+              logo={this.state.logo}
+              orderData={approveOrderData}
+              approveOrDenyOrders={this.approveOrDenyOrders}
+              approve={this.state.approve}
+              companyName={companyName}
+              totalSpend={totalSpend}
+              spendRemaining={spendRemaining}
+              userData={userData}
+              userHeaders={userHeaders}
+              userSpendData={userSpendData}
+              totalOrders={totalOrders}
+              productsPurchased={productsPurchased}
+              chartData={chartData}
+              tooltipContent={tooltipContent}
+              headers={headers}
+              tableData={tableData}
+              modalTitle={modalTitle}
+              modalData={modalData}
+              userDetails={userDetails}
+              showModal={this.state.showModal}
+              openModal={this.openModal}
+              closeModal={this.closeModal}
+              filter={this.state.filter}
+              dropdownItems={dropdownItems}
+              handleFilter={this.handleFilter}
+              logout={this.logout}
+            />} />
+          </Switch>
+        </div>
+      </Router>
+
     )
     } else {
       return (

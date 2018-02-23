@@ -114,35 +114,29 @@ function approvalNeeded(address, orderInfo) {
   else return false;
 }
 
-function updateOrderStatus(orderID, status, callback) {
+function updateOrderStatus(order_id, status, callback) {
+  console.log(status)
   const http = require("http");
+  const request = require("request")
   const base64key = Buffer.from(process.env.REACT_APP_API_USER + ':' + process.env.REACT_APP_API_KEY, 'utf8').toString('base64')
+  const url = "http://" + process.env.API_URL + "/api/orders/" + order_id
   const options = {
     "method": "PUT",
-    "hostname": process.env.API_URL,
-    "port": null,
-    "path": "/api/orders/" + orderID,
+    "url": url,
     "headers": {
       "cache-control": "no-cache",
-      Authorization: 'Basic ' + base64key
-    }
+      Authorization: 'Basic ' + base64key,
+      "Content-Type": "application/json"
+    },
+    body: { status: status, notify_user: "1", notify_department: "1" },
+  json: true
   };
 
-  const req = http.request(options, function (res) {
-      var chunks = [];
+  request(options, function (error, response, body) {
+  if (error) throw new Error(error);
 
-      res.on("data", function (chunk) {
-        chunks.push(chunk);
-      });
-
-      res.on("end", function () {
-        var body = Buffer.concat(chunks);
-        console.log(body.toString());
-      });
-    });
-
-  req.write(JSON.stringify({ OrderStatusID: status }));
-  req.end();
+  console.log(body);
+});
 }
 
 function getAPIData (options, callback) {

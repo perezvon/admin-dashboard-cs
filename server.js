@@ -24,6 +24,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
+app.get('/api', (req, res) => res.send('API active'))
+
 app.post('/api', (req, res) => {
 	const orderData = req.body[0] ? req.body[0] : req.body;
 	//check for supervisor function not currently needed; using static env variable QM_EMAIL to send approve/deny
@@ -45,7 +47,7 @@ app.get('/api/users/:company', (req, res) => {
     "cache-control": "no-cache",
     Authorization: 'Basic ' + base64key
   }
-};
+}
   helpers.getAPIData(options, data => {
     res.send(data);
   	res.end();
@@ -86,6 +88,15 @@ app.get('/api/orders/:company/:id', (req, res) => {
     res.send(data);
   	res.end();
   })
+})
+
+app.post('/api/approve-deny', (req, res) => {
+  const data = req.body
+  data.forEach(o => {
+    helpers.updateOrderStatus(o.order_id, o.status)
+  })
+  res.send({status: 'Order Statuses Updated'})
+  res.end()
 })
 
 app.get('/api/approve', (req, res) => {

@@ -37,6 +37,7 @@ export function getCompanyInfo(id) {
         companyName: 'Moorhead Fire',
         logo: 'moorheadlogo.png',
         maxSpend: 500,
+        approve: true,
         filter: 'Shift'
       };
       break;
@@ -49,7 +50,8 @@ export function getCompanyInfo(id) {
       case 4:
         return {
           companyName: 'Anoka County Sheriff',
-          logo: '',
+          logo: 'anoka.png',
+          approve: true,
           maxSpend: 250
         }
         case 7:

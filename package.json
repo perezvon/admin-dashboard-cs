@@ -11,6 +11,7 @@
     "auth0-lock": "^10.15.1",
     "body-parser": "^1.17.1",
     "bootstrap": "^3.3.7",
+    "concurrently": "^3.5.1",
     "d3": "^4.7.4",
     "dotenv": "^4.0.0",
     "email-templates": "^3.0.6",
@@ -27,7 +28,8 @@
     "react-dom": "^15.4.2",
     "react-helmet": "^5.0.3",
     "react-loading": "^0.1.2",
-    "react-router": "^4.1.1",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
     "recharts": "^0.22.0",
     "underscore": "^1.8.3"
   },
@@ -35,7 +37,7 @@
     "react-scripts": "0.9.5"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently \"nodemon server\" \"react-scripts start\"",
     "server": "node server.js",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
