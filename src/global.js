@@ -57,6 +57,7 @@ export function getCompanyInfo(id) {
           return {
             companyName: 'St. Louis Park Fire',
             logo: 'slpfire.jpg',
+            approve: true,
             maxSpend: 1000
           }
     default:

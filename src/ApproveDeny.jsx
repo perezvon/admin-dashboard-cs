@@ -48,7 +48,6 @@ export default class ApproveDeny extends React.Component {
 
   render () {
     const {data} = this.state
-    console.log(data)
     const headers = ['Order', 'Name', 'Total', 'Approved?', 'Notes'].map(i => <td>{i}</td>)
     const tableData = data.map((i, index) => <tr key={index}>
       <td>{i.order_id}</td>
