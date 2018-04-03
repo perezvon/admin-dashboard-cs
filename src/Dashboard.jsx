@@ -8,7 +8,34 @@ import {DetailModal} from './DetailModal'
 import {FilterDropdown} from './FilterDropdown'
 import ApproveDeny from './ApproveDeny'
 
-export const Dashboard = ({logo, companyName, totalSpend, spendRemaining, userData, userHeaders, userSpendData, totalOrders, productsPurchased, chartData, tooltipContent, headers, tableData, modalTitle, modalData, userDetails, showModal, openModal, closeModal, filter, approve, orderData, dropdownItems, handleFilter, approveOrDenyOrders, logout}) => {
+export const Dashboard = ({
+  logo,
+  companyName,
+  totalSpend,
+  spendRemaining,
+  userData,
+  userHeaders,
+  userSpendData,
+  totalOrders,
+  productsPurchased,
+  chartData,
+  tooltipContent,
+  headers,
+  tableData,
+  modalTitle,
+  modalData,
+  userDetails,
+  showModal,
+  openModal,
+  closeModal,
+  filter,
+  approve,
+  orderData,
+  dropdownItems,
+  handleFilter,
+  approveOrDenyOrders,
+  setActiveOrder,
+  logout}) => {
 if (approve) {
   const activeKey = orderData.length > 0 ? 2 : 1
   return (
@@ -43,12 +70,28 @@ if (approve) {
                 <Table headers={userHeaders} tableData={userSpendData} />
                 </div>
                <Table headers={headers} tableData={tableData} />
-               <DetailModal modalTitle={modalTitle} modalData={modalData} userDetails={userDetails} showModal={showModal} openModal={openModal} closeModal={closeModal} />
+               <DetailModal
+                 modalTitle={modalTitle}
+                 modalData={modalData}
+                 userDetails={userDetails}
+                 showModal={showModal}
+                 openModal={openModal}
+                 closeModal={closeModal} />
                 </div>
                }
             </Tab>
             <Tab eventKey={2} title="Approve/Deny Orders">
-              <ApproveDeny data={orderData} approveOrDenyOrders={approveOrDenyOrders}/>
+              <ApproveDeny
+                data={orderData}
+                approveOrDenyOrders={approveOrDenyOrders}
+                modalTitle={modalTitle}
+                modalData={modalData}
+                userDetails={userDetails}
+                openModal={openModal}
+                closeModal={closeModal}
+                showModal={showModal}
+                setActiveOrder={setActiveOrder}
+                />
             </Tab>
           </Tabs>
         </Col>

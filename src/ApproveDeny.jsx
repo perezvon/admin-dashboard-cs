@@ -1,6 +1,7 @@
 import React from 'react'
 import {Table} from './Table'
 import {Button, FormControl} from 'react-bootstrap'
+import {DetailModal} from './DetailModal'
 
 export default class ApproveDeny extends React.Component {
   constructor(props) {
@@ -47,12 +48,12 @@ export default class ApproveDeny extends React.Component {
   }
 
   render () {
-    const {data} = this.state
+    const {data, modalTitle, modalData, userDetails, showModal, openModal, closeModal, setActiveOrder} = this.state
     const headers = ['Order', 'Name', 'Total', 'Approved?', 'Notes'].map(i => <td>{i}</td>)
-    const tableData = data.map((i, index) => <tr key={index}>
-      <td>{i.order_id}</td>
-      <td>{i.b_firstname ? i.b_firstname + ' ' + i.b_lastname : i.email}</td>
-      <td>{`$${i.total}`}</td>
+    const tableData = data.map((i, index) => <tr key={i.order_id} data-order={i.order_id} >
+      <td onClick={setActiveOrder}>{i.order_id}</td>
+      <td onClick={setActiveOrder}>{i.b_firstname ? i.b_firstname + ' ' + i.b_lastname : i.email}</td>
+      <td onClick={setActiveOrder}>{`$${i.total}`}</td>
       <td>
         <label className="switch">
           <input type="checkbox" checked={i.approved} onChange={e => this.handleInput(e, index)} />
@@ -65,6 +66,7 @@ export default class ApproveDeny extends React.Component {
       <div>
         <Table headers={headers} tableData={tableData} />
         <Button className='btn-success' onClick={this.handleSubmit}>Submit</Button>
+        <DetailModal modalTitle={modalTitle} modalData={modalData} userDetails={userDetails} showModal={showModal} openModal={openModal} closeModal={closeModal} />
       </div>
     )
   }

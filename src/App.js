@@ -151,17 +151,17 @@ class App extends React.Component {
   handleFilter = (eventKey) => {
     this.setState({filterBy: eventKey})
   }
-  
+
   approveOrDenyOrders = data => {
     fetch('/api/approve-deny', {
-    body: JSON.stringify(data), 
-    cache: 'no-cache', 
+    body: JSON.stringify(data),
+    cache: 'no-cache',
     credentials: 'include',
     headers: {
       'content-type': 'application/json'
     },
-    method: 'POST', 
-    mode: 'same-origin', 
+    method: 'POST',
+    mode: 'same-origin',
   })
       .then(res => res.json())
       .then(json => {
@@ -232,9 +232,10 @@ class App extends React.Component {
       const customers = this.state.filterBy !== 'all' ? this.state.customers.filter(c => c.AdditionalField2 === this.state.filterBy) : this.state.customers;
       const customerIDs = [...new Set(customers.map(item => item.user_id))]
       let data = this.state.data.filter(i => customerIDs.indexOf(i.user_id) !== -1);
-      if (this.state.approve) data = data.filter(i => i.status === 'P')
+      let approvedOrders;
+      if (this.state.approve) approvedOrders = data.filter(i => i.status === 'P')
       //populate orders array
-      data.forEach(i => {
+      approvedOrders.forEach(i => {
         let orderNumber = i.order_id;
         let date = moment.unix(i.timestamp).format('MMMM DD, YYYY');
         let username = i.b_firstname ? i.b_firstname + ' ' + i.b_lastname : i.email;
@@ -258,18 +259,18 @@ class App extends React.Component {
       dropdownItems = dropdownItems.map((item, index) => <MenuItem key={index} eventKey={item}>{item}</MenuItem>)
 
       //get unique users && create dataset for each
-      const uniqueUsers = [...new Set(data.map(item => item.user_id))];
+      const uniqueUsers = [...new Set(approvedOrders.map(item => item.user_id))];
       totalSpendRemaining = this.state.maxSpend * uniqueUsers.length;
 
       uniqueUsers.forEach(user => {
-        let userName = data.filter(i=>i.user_id === user);
+        let userName = approvedOrders.filter(i=>i.user_id === user);
         userName = userName && userName[0].b_firstname ? userName[0].b_firstname + ' ' + userName[0].b_lastname : userName[0].email;
         let currentTotal = 0;
         let numOfOrders = 0;
-        for (let i = 0; i < data.length; i++) {
-          if (user === data[i].user_id) {
+        for (let i = 0; i < approvedOrders.length; i++) {
+          if (user === approvedOrders[i].user_id) {
             numOfOrders++;
-            currentTotal += +data[i].total;
+            currentTotal += +approvedOrders[i].total;
           }
         }
 
@@ -299,10 +300,10 @@ class App extends React.Component {
       })
 
       //number of orders
-      totalOrders = <h3>Number of Orders: <span className='green-text'>{data.length}</span></h3>
+      totalOrders = <h3>Number of Orders: <span className='green-text'>{approvedOrders.length}</span></h3>
 
       //total products purchased
-      totalProductCount = data.map(i => i.products)
+      totalProductCount = approvedOrders.map(i => i.products)
       let numOfProducts = 0;
       for (let i = 0; i < totalProductCount.length; i++) {
         numOfProducts += Object.keys(totalProductCount[i]).length
@@ -380,6 +381,7 @@ class App extends React.Component {
               showModal={this.state.showModal}
               openModal={this.openModal}
               closeModal={this.closeModal}
+              setActiveOrder={this.setActiveOrder}
               filter={this.state.filter}
               dropdownItems={dropdownItems}
               handleFilter={this.handleFilter}
