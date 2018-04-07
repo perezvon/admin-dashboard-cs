@@ -1,6 +1,11 @@
 /* eslint-disable */
 import _ from 'underscore'
 
+export function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
+
 export function getStoreID(username) {
   switch(username) {
     case 'moorhead':
@@ -12,10 +17,13 @@ export function getStoreID(username) {
     case 'anokasheriff':
       return 4;
       break;
-      case 'slpfire':
-      case 'tsmith':
-        return 7;
-        break;
+    case 'slpfire':
+    case 'tsmith':
+      return 7;
+      break;
+    case 'lakejofire':
+      return 8;
+      break;
     default:
       return 0;
   }
@@ -53,13 +61,19 @@ export function getCompanyInfo(id) {
           approve: true,
           maxSpend: 250
         }
-        case 7:
-          return {
-            companyName: 'St. Louis Park Fire',
-            logo: 'slpfire.jpg',
-            approve: true,
-            maxSpend: 1000
-          }
+      case 7:
+        return {
+          companyName: 'St. Louis Park Fire',
+          logo: 'slpfire.jpg',
+          approve: true,
+          maxSpend: 1000
+        }
+      case 8:
+        return {
+          companyName: 'Lake Johanna Fire',
+          logo: 'lakejofire.jpg',
+          maxSpend: 150
+        }
     default:
       return {
         companyName: '',
