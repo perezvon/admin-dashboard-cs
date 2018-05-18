@@ -65,7 +65,9 @@ if (approve) {
                     <UserSpendChart chartData={chartData} tooltipContent={tooltipContent} />
                   </div>
                 </div>
-                {/*<FilterDropdown filter={filter} dropdownItems={dropdownItems} handleFilter={handleFilter}/>*/}
+                { filter &&
+                  <FilterDropdown filter={filter} dropdownItems={dropdownItems} handleFilter={handleFilter}/>
+                }
                 <div className='col-md-6'>
                 <Table headers={userHeaders} tableData={userSpendData} />
                 </div>
@@ -123,7 +125,9 @@ else {
                 <UserSpendChart chartData={chartData} tooltipContent={tooltipContent} />
               </Col>
             </Row>
-            {/*<FilterDropdown filter={filter} dropdownItems={dropdownItems} handleFilter={handleFilter}/>*/}
+            { filter &&
+              <FilterDropdown filter={filter} dropdownItems={dropdownItems} handleFilter={handleFilter}/>
+            }
             <Col md={6}>
             <Table headers={userHeaders} tableData={userSpendData} />
             </Col>
