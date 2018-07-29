@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.css';
-import {Dashboard} from './Dashboard'
-import Loading from 'react-loading'
+import {Dashboard} from './Dashboard';
+import Loading from 'react-loading';
 import {MenuItem} from 'react-bootstrap'
-import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
-import _ from 'underscore'
-import Auth0Lock from 'auth0-lock'
-import {sortCollection, getCompanyInfo, getStoreID, getFilterFieldName, validateEmail} from './global'
-import moment from 'moment'
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
+import _ from 'underscore';
+import Auth0Lock from 'auth0-lock';
+import {sortCollection, getCompanyInfo, getStoreID, getFilterFieldName, validateEmail} from './global';
+import moment from 'moment';
 
 const lock = new Auth0Lock(
   process.env.REACT_APP_AUTH0_KEY,
