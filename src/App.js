@@ -191,6 +191,11 @@ class App extends React.Component {
 
   componentDidMount = () => {
     if (token) {
+      let shouldFetchUpdates = false;
+      if ((moment() - moment(localStorage.getItem('lastUpdate'))) > 360000) {
+        shouldFetchUpdates = true;
+      }
+      if (shouldFetchUpdates || !localStorage.getItem('rehydrateState')) {
           fetch('/api/orders/' + currentId)
             .then(res => res.json())
             .then(json => {
@@ -220,6 +225,8 @@ class App extends React.Component {
                 .then(res => res.json())
                 .then(json => this.setState({customers: json.users}))
                 .then(() => {
+                  localStorage.setItem('rehydrateState', JSON.stringify(this.state));
+                  localStorage.setItem('lastUpdate', moment());
                   this.setState({
                     loading: false
                   })
@@ -229,12 +236,21 @@ class App extends React.Component {
         .catch(err => {
           console.error(err)
         })
+    } else {
+      //use locally stored data
+      let data = JSON.parse(localStorage.getItem('rehydrateState'));
+      this.setState({
+        ...data,
+        loading: false
+      })
     }
+  }
   }
 
   render() {
     if (token) {
       if (!this.state.loading) {
+        console.log(this.props)
         console.log(this.state)
         let {data, filteredData, userDetails, filter, showModal, approve, logo} = this.state;
         let orderData, userOrderData;

@@ -33,6 +33,8 @@ export function getStoreID (username) {
       break;
     case 'lakejofire':
       return 8;
+    case 'minnetonkapd':
+      return 15;
       break;
     default:
       return 0;
@@ -123,6 +125,13 @@ export function getCompanyInfo(id) {
         return {
           companyName: 'Lake Johanna Fire',
           logo: 'lakejofire.jpg',
+          maxSpend: 0
+        }
+      case 15:
+        return {
+          companyName: 'Minnetonka Police',
+          logo: 'minnetonkapolice.jpg',
+          approve: true,
           maxSpend: 0
         }
     default:
