@@ -5,3 +5,4 @@ MAIL_USER=mailserviceusername
 MAIL_PASS=pw
 QM_EMAIL=email
 API_URL=url
+MAIL_SEND_ADDRESS='"Company Name" <no-reply at company123.com>'

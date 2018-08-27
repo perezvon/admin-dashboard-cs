@@ -106,7 +106,7 @@ function approvalNeeded(address, orderInfo) {
   updateOrderStatus(orderInfo.OrderID, 6);
   //send approval email
   const options = {
-    from: '"Aspen Mills" <orders@aspenmills.com>',
+    from: process.env.MAIL_SEND_ADDRESS,
     to: address, // list of receivers
     subject: 'Approval Needed - Order #' + orderInfo.InvoiceNumberPrefix + orderInfo.InvoiceNumber
   }
