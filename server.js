@@ -120,7 +120,7 @@ app.post('/api/approve', (req, res) => {
 	helpers.getOrderInfo(OrderID, order => {
 		order.comment = comment
 		const options = {
-			from: '"Aspen Mills" <orders@aspenmills.com>',
+			from: process.env.MAIL_SEND_ADDRESS,
 			to: address, // list of receivers
 			subject: 'Order Denied - Order #' + orderNumber
 		}
