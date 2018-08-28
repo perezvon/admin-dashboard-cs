@@ -10,6 +10,8 @@ import Auth0Lock from 'auth0-lock';
 import {sortCollection, getCompanyInfo, getStoreID, getFilterFieldName, validateEmail} from './global';
 import moment from 'moment';
 
+const fromUrl = document.referrer || 'https://qm-dashboard.herokuapp.com';
+
 const lock = new Auth0Lock(
   process.env.REACT_APP_AUTH0_KEY,
   'perezvon.auth0.com',
@@ -23,19 +25,18 @@ const lock = new Auth0Lock(
 );
 
 const db = new PouchDB('sessionData');
-db.info().then(function (info) {
-  console.log(info);
-})
 
-lock.on("authenticated", function(authResult) {
+lock.on('authenticated', function(authResult) {
   // Use the token in authResult to getUserInfo() and save it to localStorage
   lock.getUserInfo(authResult.accessToken, (error, profile) => {
     if (error) {
       console.log(error)
       return;
     }
+    console.log(profile.app_metadata.storeID)
     localStorage.setItem('accessToken', authResult.accessToken);
     localStorage.setItem('username', profile.username);
+    localStorage.setItem('profile', profile.app_metadata);
   });
 });
 
@@ -158,9 +159,11 @@ class App extends React.Component {
   }
 
   logout = () => {
-    lock.logout();
+    db.remove('sessionData');
     localStorage.clear();
-    window.history.back();
+    lock.logout({
+      returnTo: fromUrl
+    });
   }
 
   handleFilter = eventKey => {
@@ -236,6 +239,7 @@ class App extends React.Component {
                     _id: 'sessionData',
                     ...this.state
                   }
+                  db.remove('sessionData');
                   db.put(data);
                   this.setState({
                     loading: false
@@ -460,7 +464,7 @@ class App extends React.Component {
           )
         }
     } else {
-      lock.show()
+      lock.show();
     }
   }
 }
