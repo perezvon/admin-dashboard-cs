@@ -2,7 +2,8 @@ import React from 'react';
 import './App.css';
 import {Dashboard} from './Dashboard';
 import Loading from 'react-loading';
-import {MenuItem} from 'react-bootstrap'
+import {MenuItem} from 'react-bootstrap';
+import PouchDB from 'pouchdb-browser';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import _ from 'underscore';
 import Auth0Lock from 'auth0-lock';
@@ -20,6 +21,11 @@ const lock = new Auth0Lock(
     }
   }
 );
+
+const db = new PouchDB('sessionData');
+db.info().then(function (info) {
+  console.log(info);
+})
 
 lock.on("authenticated", function(authResult) {
   // Use the token in authResult to getUserInfo() and save it to localStorage
@@ -195,7 +201,7 @@ class App extends React.Component {
       if ((moment() - moment(localStorage.getItem('lastUpdate'))) > 360000) {
         shouldFetchUpdates = true;
       }
-      if (shouldFetchUpdates || !localStorage.getItem('rehydrateState')) {
+      if (shouldFetchUpdates || !localStorage.getItem('lastUpdate')) {
           fetch('/api/orders/' + currentId)
             .then(res => res.json())
             .then(json => {
@@ -225,8 +231,12 @@ class App extends React.Component {
                 .then(res => res.json())
                 .then(json => this.setState({customers: json.users}))
                 .then(() => {
-                  localStorage.setItem('rehydrateState', JSON.stringify(this.state));
                   localStorage.setItem('lastUpdate', moment());
+                  let data = {
+                    _id: 'sessionData',
+                    ...this.state
+                  }
+                  db.put(data);
                   this.setState({
                     loading: false
                   })
@@ -238,11 +248,12 @@ class App extends React.Component {
         })
     } else {
       //use locally stored data
-      let data = JSON.parse(localStorage.getItem('rehydrateState'));
-      this.setState({
-        ...data,
-        loading: false
-      })
+      db.get('sessionData').then((doc) => {
+        this.setState({
+          ...doc,
+          loading: false
+        })
+      });
     }
   }
   }
