@@ -1,14 +1,14 @@
 'use strict';
 
-require('dotenv').config()
+require('dotenv').config();
 
-const express = require('express')
-const bodyParser = require('body-parser')
+const express = require('express');
+const bodyParser = require('body-parser');
 const path = require('path');
 
-const helpers = require('./globalHelpers.js')
+const helpers = require('./globalHelpers.js');
 
-const app = express()
+const app = express();
 
 const port = process.env.PORT || 3001;
 
@@ -24,14 +24,14 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
-app.get('/api', (req, res) => res.send('API active'))
+app.get('/api', (req, res) => res.send('API active'));
 
 app.post('/api', (req, res) => {
 	const orderData = req.body[0] ? req.body[0] : req.body;
-	//check for supervisor function not currently needed; using static env variable QM_EMAIL to send approve/deny
-	//helpers.checkForSupervisor(orderData.CustomerID, adminEmail => {
-		helpers.approvalNeeded(process.env.QM_EMAIL, orderData);
-	//});
+  console.log(orderData)
+	helpers.checkForSupervisor(orderData.user_id, company_id => {
+		helpers.approvalNeeded(company_id, orderData);
+	});
 	res.end('yes');
 })
 
@@ -96,14 +96,14 @@ app.post('/api/approve-deny', (req, res) => {
     helpers.updateOrderStatus(o.order_id, o.status)
   })
   res.send({status: 'Order Statuses Updated'})
-  res.end()
+  res.end();
 })
 
 app.get('/api/approve', (req, res) => {
 	const approved = req.query.result;
 	const orderID = req.query.OrderID;
 	if (approved === 'true') {
-		helpers.updateOrderStatus(orderID, 8)
+		helpers.updateOrderStatus(orderID, 'P')
 		res.send('request approved!')
 	} else {
 		//helpers.updateOrderStatus(orderID, 9)

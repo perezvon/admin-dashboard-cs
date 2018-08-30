@@ -33,7 +33,6 @@ lock.on('authenticated', function(authResult) {
       console.log(error)
       return;
     }
-    console.log(profile.app_metadata.storeID)
     localStorage.setItem('accessToken', authResult.accessToken);
     localStorage.setItem('username', profile.username);
     localStorage.setItem('profile', profile.app_metadata);

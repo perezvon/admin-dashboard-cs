@@ -67,15 +67,23 @@ function getOrderInfo(orderID, callback) {
   req.end();
 }
 
-//currently deprecated, sending with env var QM_EMAIL instead. We'd use this if there were more than one supervisor/QM for a group.
-function checkForSupervisor(customerID, callback) {
+function findQMAddress(company_id) {
+  switch(company_id) {
+    case 15:
+      return 'kthoele@eminnetonka.com';
+    default:
+      return '';
+  }
+}
+
+function checkForSupervisor(user_id, callback) {
   const http = require("http");
   const base64key = Buffer.from(process.env.REACT_APP_API_USER + ':' + process.env.REACT_APP_API_KEY, 'utf8').toString('base64')
   const options = {
     "method": "GET",
     "hostname": process.env.API_URL,
     "port": null,
-    "path": "/api/customers/" + customerID,
+    "path": "/api/users/" + user_id,
     "headers": {
       "cache-control": "no-cache",
       Authorization: 'Basic ' + base64key
@@ -93,7 +101,7 @@ function checkForSupervisor(customerID, callback) {
       var body = Buffer.concat(chunks);
       if (body && !!body.toString()) {
         const user = JSON.parse(body.toString())[0];
-        return callback(user.AdditionalField1);
+        return callback(user.company_id);
       }
   });
 });
@@ -101,14 +109,15 @@ function checkForSupervisor(customerID, callback) {
 req.end();
 }
 
-function approvalNeeded(address, orderInfo) {
-  //update order status to Awaiting Approval / On Hold
-  updateOrderStatus(orderInfo.OrderID, 6);
+function approvalNeeded(company_id, orderInfo) {
+  //update order status to Approval Needed
+  updateOrderStatus(orderInfo.order_id, 'Y');
+  const address = findQMAddress(company_id);
   //send approval email
   const options = {
     from: process.env.MAIL_SEND_ADDRESS,
     to: address, // list of receivers
-    subject: 'Approval Needed - Order #' + orderInfo.InvoiceNumberPrefix + orderInfo.InvoiceNumber
+    subject: 'Approval Needed - Order #' + orderInfo.order_id
   }
 	if (address) sendEmail(address, options, orderInfo, 'approval')
   else return false;
