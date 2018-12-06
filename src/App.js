@@ -216,7 +216,8 @@ class App extends React.Component {
                 fetch('/api/orders/' + currentId + '/' + order.order_id)
                   .then(res => res.json())
                   .then(json => {
-                    let data = this.state.data
+                    let data = this.state.data;
+                    if (moment.unix(+json.timestamp).isSame(moment(), 'year'))
                     data.push(json)
                     this.setState({
                       data: data,
