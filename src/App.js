@@ -25,7 +25,6 @@ const lock = new Auth0Lock(
 );
 
 const db = new PouchDB('sessionData');
-
 lock.on('authenticated', function(authResult) {
   // Use the token in authResult to getUserInfo() and save it to localStorage
   lock.getUserInfo(authResult.accessToken, (error, profile) => {

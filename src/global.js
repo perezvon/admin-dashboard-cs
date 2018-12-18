@@ -36,6 +36,9 @@ export function getStoreID (username) {
     case 'minnetonkapd':
       return 15;
       break;
+    case 'airguard':
+      return 17;
+      break;
     default:
       return 0;
   }
@@ -132,6 +135,13 @@ export function getCompanyInfo(id) {
           companyName: 'Minnetonka Police',
           logo: 'minnetonkapolice.jpg',
           approve: true,
+          maxSpend: 0
+        }
+      case 17:
+        return {
+          companyName: 'Air Guard Fire',
+          logo: 'airguard.jpg',
+          approve: false,
           maxSpend: 0
         }
     default:
