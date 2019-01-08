@@ -33,11 +33,15 @@ export function getStoreID (username) {
       break;
     case 'lakejofire':
       return 8;
+    case 'superadmin':
     case 'minnetonkapd':
       return 15;
       break;
     case 'airguard':
       return 17;
+      break;
+    case 'blainepd':
+      return 20;
       break;
     default:
       return 0;
