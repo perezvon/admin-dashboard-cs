@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Grid, Row, Col, Tabs, Tab} from 'react-bootstrap'
+import {Button, Grid, Row, Col, Tabs, Tab, FormGroup, ControlLabel, FormControl } from 'react-bootstrap'
 import './Dashboard.css';
 import {Table} from './Table'
 import {UserSpendChart} from './UserSpendChart'
@@ -33,6 +33,8 @@ export const Dashboard = ({
   orderData,
   dropdownItems,
   handleFilter,
+  year,
+  handleYear,
   approveOrDenyOrders,
   setActiveOrder,
   logout}) => {
@@ -128,6 +130,16 @@ else {
             { filter &&
               <FilterDropdown filter={filter} dropdownItems={dropdownItems} handleFilter={handleFilter}/>
             }
+            
+              <FormGroup controlId="formControlsSelect">
+                <ControlLabel>Select</ControlLabel>
+                <FormControl onChange={e => handleYear(e.target.value)} componentClass="select" placeholder="select">
+                  <option value="select">select</option>
+                  <option value="all">all</option>
+                  <option value='01/01/2019'>2019</option>
+                  <option value='01/01/2018'>2018</option>
+                </FormControl>
+              </FormGroup>
             <Col md={6}>
             <Table headers={userHeaders} tableData={userSpendData} />
             </Col>

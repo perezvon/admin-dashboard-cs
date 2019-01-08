@@ -148,6 +148,13 @@ export function getCompanyInfo(id) {
           approve: false,
           maxSpend: 0
         }
+      case 20:
+        return {
+          companyName: 'Blaine Police Department',
+          logo: 'blainepd.png',
+          approve: true,
+          maxSpend: 0
+        }
     default:
       return {
         companyName: '',

@@ -3,7 +3,6 @@ import './App.css';
 import {Dashboard} from './Dashboard';
 import Loading from 'react-loading';
 import {MenuItem} from 'react-bootstrap';
-import PouchDB from 'pouchdb-browser';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import _ from 'underscore';
 import Auth0Lock from 'auth0-lock';
@@ -24,7 +23,6 @@ const lock = new Auth0Lock(
   }
 );
 
-const db = new PouchDB('sessionData');
 lock.on('authenticated', function(authResult) {
   // Use the token in authResult to getUserInfo() and save it to localStorage
   lock.getUserInfo(authResult.accessToken, (error, profile) => {
@@ -52,6 +50,7 @@ class App extends React.Component {
       showModal: false,
       activeOrder: 0,
       activeUser: '',
+      year: moment(),
       filter: '',
       filterBy: 'all',
       reverse: true,
@@ -157,7 +156,6 @@ class App extends React.Component {
   }
 
   logout = () => {
-    db.remove('sessionData');
     localStorage.clear();
     lock.logout({
       returnTo: fromUrl
@@ -174,6 +172,20 @@ class App extends React.Component {
       })
     } else this.setState({
       filterBy: eventKey,
+      filteredData: this.state.data
+    });
+  }
+  
+  handleYear = year => {
+    if (year !== 'all') {
+      this.setState(prevState => {
+        return {
+          year: moment(year),
+          filteredData: prevState.data.filter(d => moment.unix(+d.timestamp).isSame(moment(year), 'year'))
+        }
+      })
+    } else this.setState({
+      year: moment(),
       filteredData: this.state.data
     });
   }
@@ -202,7 +214,7 @@ class App extends React.Component {
       if ((moment() - moment(localStorage.getItem('lastUpdate'))) > 360000) {
         shouldFetchUpdates = true;
       }
-      if (shouldFetchUpdates || !localStorage.getItem('lastUpdate')) {
+      // if (shouldFetchUpdates || !localStorage.getItem('lastUpdate')) {
           fetch('/api/orders/' + currentId)
             .then(res => res.json())
             .then(json => {
@@ -216,11 +228,11 @@ class App extends React.Component {
                   .then(res => res.json())
                   .then(json => {
                     let data = this.state.data;
-                    if (moment.unix(+json.timestamp).isSame(moment(), 'year'))
-                    data.push(json)
+                    // if (moment.unix(+json.timestamp).isSame(this.state.year, 'year'))
+                    data.push(json);
                     this.setState({
                       data: data,
-                      filteredData: data
+                      filteredData: data.filter(d => moment.unix(+d.timestamp).isSame(this.state.year, 'year'))
                     })
                   })
                   .catch(err => {
@@ -234,12 +246,6 @@ class App extends React.Component {
                 .then(json => this.setState({customers: json.users}))
                 .then(() => {
                   localStorage.setItem('lastUpdate', moment());
-                  let data = {
-                    _id: 'sessionData',
-                    ...this.state
-                  }
-                  db.remove('sessionData');
-                  db.put(data);
                   this.setState({
                     loading: false
                   })
@@ -249,23 +255,22 @@ class App extends React.Component {
         .catch(err => {
           console.error(err)
         })
-    } else {
-      //use locally stored data
-      db.get('sessionData').then((doc) => {
-        this.setState({
-          ...doc,
-          loading: false
-        })
-      });
-    }
+    // } else {
+    //   //use locally stored data
+    //   db.get('sessionData').then((doc) => {
+    //     this.setState({
+    //       ...doc,
+    //       loading: false
+    //     })
+    //   });
+    // }
   }
   }
 
   render() {
     if (token) {
       if (!this.state.loading) {
-        console.log(this.props)
-        console.log(this.state)
+        console.log(this.state.year)
         let {data, filteredData, userDetails, filter, showModal, approve, logo} = this.state;
         let orderData, userOrderData;
         let companyName = this.state.filterBy !=='all' ? this.state.companyName + ' — ' + getFilterFieldName(this.state.filter) + ' ' + this.state.filterFields[this.state.filterBy].split(' ')[0] : this.state.companyName;
@@ -286,6 +291,7 @@ class App extends React.Component {
         let modalData, modalTitle;
         let userTotals = [];
         let dropdownItems;
+        const selectedYear = moment.isMoment(this.state.year) ? moment(this.state.year).format('YYYY') : this.state.year;
         const customerIDs = [...new Set(this.state.customers.map(item => item.user_id))]
         let currentData = filteredData.filter(i => customerIDs.indexOf(i.user_id) !== -1);
         let approvedOrders = this.state.approve ? currentData.filter(i => i.status === 'P') : currentData.filter(i => i.status !== 'I')
@@ -378,8 +384,8 @@ class App extends React.Component {
           chartData = userTotals.map(user => {return {'name': user.name,'total': user.total}});
           tooltipContent = chartData.map(item => {return {'name': item.name,'total': '$' + item.total.toFixed(2)}});
           //update UI
-          totalSpend = <h2>Total Spend 2018: <span className='green-text'>${companyTotal.toFixed(2)}</span></h2>
-          spendRemaining = <h2>Amount Remaining 2018: <span className='green-text'>${+totalSpendRemaining.toFixed(2)}</span></h2>
+          totalSpend = <h2>Total Spend {selectedYear}: <span className='green-text'>${companyTotal.toFixed(2)}</span></h2>
+          spendRemaining = <h2>Amount Remaining {selectedYear}: <span className='green-text'>${+totalSpendRemaining.toFixed(2)}</span></h2>
           userData = userTotals.map((user, index) => {
             const textColor = user.total <= this.state.maxSpend ? 'green-text' : 'red-text';
             return <h3 key={index}>{user.name}: <span className={textColor}>${user.total.toFixed(2)}</span></h3>
@@ -446,6 +452,8 @@ class App extends React.Component {
                   closeModal={this.closeModal}
                   setActiveOrder={this.setActiveOrder}
                   filter={getFilterFieldName(filter)}
+                  year={this.state.year}
+                  handleYear={this.handleYear}
                   dropdownItems={dropdownItems}
                   handleFilter={this.handleFilter}
                   logout={this.logout}
