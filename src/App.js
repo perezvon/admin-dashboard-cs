@@ -178,14 +178,15 @@ class App extends React.Component {
   
   handleYear = year => {
     if (year !== 'all') {
+      const formattedYear = moment(`01/01/${year}`)
       this.setState(prevState => {
         return {
-          year: moment(year),
-          filteredData: prevState.data.filter(d => moment.unix(+d.timestamp).isSame(moment(year), 'year'))
+          year: formattedYear,
+          filteredData: prevState.data.filter(d => moment.unix(+d.timestamp).isSame(formattedYear, 'year'))
         }
       })
     } else this.setState({
-      year: moment(),
+      year: 'all',
       filteredData: this.state.data
     });
   }
@@ -270,7 +271,6 @@ class App extends React.Component {
   render() {
     if (token) {
       if (!this.state.loading) {
-        console.log(this.state.year)
         let {data, filteredData, userDetails, filter, showModal, approve, logo} = this.state;
         let orderData, userOrderData;
         let companyName = this.state.filterBy !=='all' ? this.state.companyName + ' — ' + getFilterFieldName(this.state.filter) + ' ' + this.state.filterFields[this.state.filterBy].split(' ')[0] : this.state.companyName;

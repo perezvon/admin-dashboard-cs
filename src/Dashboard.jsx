@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import {Button, Grid, Row, Col, Tabs, Tab, FormGroup, ControlLabel, FormControl } from 'react-bootstrap'
 import './Dashboard.css';
 import {Table} from './Table'
@@ -38,8 +39,18 @@ export const Dashboard = ({
   approveOrDenyOrders,
   setActiveOrder,
   logout}) => {
+const formattedYear = moment.isMoment(year) ? moment(year).format('YYYY') : year;
+const yearSelect = <FormGroup controlId="formControlsSelect">
+  <ControlLabel>Filter by Year:</ControlLabel>
+  <FormControl style={{width: '200px'}} value={formattedYear} onChange={e => handleYear(e.target.value)} componentClass="select" placeholder="select">
+    <option value='all'>all</option>
+    <option value={'2019'}>2019</option>
+    <option value={'2018'}>2018</option>
+  </FormControl>
+  </FormGroup>
 if (approve) {
   const activeKey = orderData.length > 0 ? 2 : 1
+  
   return (
     <Grid>
       <Row>
@@ -52,6 +63,7 @@ if (approve) {
       </Row>
       <Row>
         <Col md={12}>
+          {yearSelect}
           <Tabs defaultActiveKey={activeKey} id="qm-tabs" style={{marginTop: '20px'}}>
             <Tab eventKey={1} title="Orders Summary">
               {userData &&
@@ -118,6 +130,7 @@ else {
             <div>
             <Row>
               <Col md={6}>
+                {yearSelect}
                 {totalSpend}
                 {spendRemaining}
                 {totalOrders}
@@ -130,16 +143,6 @@ else {
             { filter &&
               <FilterDropdown filter={filter} dropdownItems={dropdownItems} handleFilter={handleFilter}/>
             }
-            
-              <FormGroup controlId="formControlsSelect">
-                <ControlLabel>Select</ControlLabel>
-                <FormControl onChange={e => handleYear(e.target.value)} componentClass="select" placeholder="select">
-                  <option value="select">select</option>
-                  <option value="all">all</option>
-                  <option value='01/01/2019'>2019</option>
-                  <option value='01/01/2018'>2018</option>
-                </FormControl>
-              </FormGroup>
             <Col md={6}>
             <Table headers={userHeaders} tableData={userSpendData} />
             </Col>
