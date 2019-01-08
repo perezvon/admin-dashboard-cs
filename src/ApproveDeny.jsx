@@ -62,12 +62,16 @@ export default class ApproveDeny extends React.Component {
       </td>
       <td><FormControl componentClass="textarea" placeholder='Enter notes for employee here (optional)' value={i.approve_deny_notes} onChange={e => this.handleInput(e, index)}></FormControl></td>
     </tr>)
-    return (
-      <div>
-        <Table headers={headers} tableData={tableData} />
-        <Button className='btn-success' onClick={this.handleSubmit}>Submit</Button>
-        <DetailModal modalTitle={modalTitle} modalData={modalData} userDetails={userDetails} showModal={showModal} openModal={openModal} closeModal={closeModal} />
-      </div>
-    )
+    if (data.length > 0){
+      return (
+        <div>
+          <Table headers={headers} tableData={tableData} />
+          <Button className='btn-success' onClick={this.handleSubmit}>Submit</Button>
+          <DetailModal modalTitle={modalTitle} modalData={modalData} userDetails={userDetails} showModal={showModal} openModal={openModal} closeModal={closeModal} />
+        </div>
+      )
+    } else {
+      return <h3>No Orders to Approve!</h3>
+    }
   }
 }
