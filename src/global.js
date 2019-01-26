@@ -43,6 +43,21 @@ export function getStoreID (username) {
     case 'blainepd':
       return 20;
       break;
+    case 'hennepinems':
+      return 14;
+      break;
+    case 'chaskafire':
+      return 16;
+      break;
+    case 'farmingtonfire':
+      return 18;
+      break;
+    case 'bpfire':
+      return 21;
+      break;
+    case 'ighpd':
+      return 23;
+      break;
     default:
       return 0;
   }
@@ -134,6 +149,12 @@ export function getCompanyInfo(id) {
           logo: 'lakejofire.jpg',
           maxSpend: 0
         }
+      case 14:
+        return {
+          companyName: 'Hennepin EMS',
+          logo: 'hennepinems.png',
+          maxSpend: 0
+        }
       case 15:
         return {
           companyName: 'Minnetonka Police',
@@ -141,17 +162,41 @@ export function getCompanyInfo(id) {
           approve: true,
           maxSpend: 0
         }
+      case 16:
+        return {
+          companyName: 'Chaska Fire Department',
+          logo: 'chaskafire.jpg',
+          maxSpend: 0
+        }
       case 17:
         return {
           companyName: 'Air Guard Fire',
           logo: 'airguard.jpg',
-          approve: false,
+          maxSpend: 0
+        }
+      case 18:
+        return {
+          companyName: 'Farmington Fire',
+          logo: 'farmingtonfire.jpg',
           maxSpend: 0
         }
       case 20:
         return {
           companyName: 'Blaine Police Department',
           logo: 'blainepd.png',
+          approve: true,
+          maxSpend: 0
+        }
+      case 21:
+        return {
+          companyName: 'Brooklyn Park Fire',
+          logo: 'bpfire.jpg',
+          maxSpend: 0
+        }
+      case 23:
+        return {
+          companyName: 'Inver Grove Heights Police Department',
+          logo: 'ighpd.jpg',
           approve: true,
           maxSpend: 0
         }
