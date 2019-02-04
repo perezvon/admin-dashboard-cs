@@ -153,6 +153,7 @@ export function getCompanyInfo(id) {
         return {
           companyName: 'Hennepin EMS',
           logo: 'hennepinems.png',
+          approve: true,
           maxSpend: 0
         }
       case 15:
