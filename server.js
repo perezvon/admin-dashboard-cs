@@ -13,10 +13,10 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 //support parsing of application/json type post data
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '5mb'}));
 
 //support parsing of application/x-www-form-urlencoded post data
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 
 app.use(express.static(path.resolve(__dirname, 'build')));
 
