@@ -133,7 +133,6 @@ export function getCompanyInfo(id) {
         return {
           companyName: 'Anoka County Sheriff',
           logo: 'anoka.png',
-          approve: true,
           maxSpend: 0
         }
       case 7:
