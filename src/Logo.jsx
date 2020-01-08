@@ -1,5 +1,5 @@
-import React from 'react'
+import React from "react";
 
-export const Logo = ({logo}) => (
-  <img src={logo} width='150' alt='company logo'></img>
-)
+export const Logo = ({ logo }) => (
+  <img src={logo} width="150" alt="company logo"></img>
+);
