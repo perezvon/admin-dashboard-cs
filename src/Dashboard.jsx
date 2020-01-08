@@ -56,7 +56,7 @@ if (approve) {
     <Grid>
       <Row>
        <Col md={10}>
-         <h1><Logo logo={logo}/> {companyName}</h1>
+         <h1>{logo ? <Logo logo={logo}/> : {companyName}}</h1>
       </Col>
         <Col md={2}>
         <Button bsStyle='warning' onClick={logout}>Logout</Button>
@@ -121,7 +121,7 @@ else {
       <Grid>
           <Row>
            <Col md={10}>
-          <h1><Logo logo={logo}/> {companyName}</h1>
+          <h1>{logo ? <Logo logo={logo}/> : {companyName}}</h1>
           </Col>
             <Col md={2}>
               <Button bsStyle='warning' onClick={logout}>Logout</Button>
