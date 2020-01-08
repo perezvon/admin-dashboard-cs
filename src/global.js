@@ -56,6 +56,7 @@ export function getStoreID (username) {
       return 21;
       break;
     case 'ighpd':
+    case 'invergrove':
       return 23;
       break;
     case 'allinaems':
