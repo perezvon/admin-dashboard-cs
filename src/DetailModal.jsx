@@ -1,6 +1,11 @@
 import React from "react";
 import { UserDetails } from "./UserDetails";
 import { Button, Layer } from "grommet";
+import styled from "styled-components";
+
+const StyledLayer = styled(Layer)`
+  padding: 20px;
+`;
 
 export const DetailModal = ({
   modalTitle,
@@ -11,7 +16,7 @@ export const DetailModal = ({
   userDetails
 }) =>
   showModal && (
-    <Layer bsSize="large" aria-labelledby="contained-modal-title-lg">
+    <StyledLayer bsSize="large" aria-labelledby="contained-modal-title-lg">
       <header>
         <h2>{modalTitle}</h2>
       </header>
@@ -33,5 +38,5 @@ export const DetailModal = ({
       <footer>
         <Button onClick={closeModal}>Close</Button>
       </footer>
-    </Layer>
+    </StyledLayer>
   );

@@ -37,32 +37,38 @@ const lock = new Auth0Lock(
     allowedConnections: ["Username-Password-Authentication"],
     languageDictionary: {
       usernameOrEmailInputPlaceholder: "username",
-      title: "Quartermaster Dashboard"
+      title: "QM Dashboard"
     }
   }
 );
 
-lock.on("authenticated", function(authResult) {
-  // Use the token in authResult to getUserInfo() and save it to localStorage
-  lock.getUserInfo(authResult.accessToken, (error, profile) => {
-    if (error) {
-      console.log(error);
-      return;
-    }
-    localStorage.setItem("accessToken", authResult.accessToken);
-    localStorage.setItem("username", profile.username);
-    localStorage.setItem("profile", profile.app_metadata);
-  });
-});
-
-const token = localStorage.getItem("accessToken");
-const username = localStorage.getItem("username");
-const currentId = getStoreID(username);
-
 class App extends React.Component {
   constructor(props) {
     super(props);
+    const self = this;
+    lock.on("authenticated", function(authResult) {
+      // Use the token in authResult to getUserInfo() and save it to localStorage
+      lock.getUserInfo(authResult.accessToken, (error, profile) => {
+        if (error) {
+          console.log(error);
+          return;
+        }
+        localStorage.setItem("accessToken", authResult.accessToken);
+        localStorage.setItem("username", profile.username);
+        localStorage.setItem("profile", profile.app_metadata);
+
+        self.setState({
+          token: localStorage.getItem("accessToken"),
+          username: localStorage.getItem("username"),
+          currentId: getStoreID(profile.username)
+        });
+      });
+    });
+
     this.state = {
+      token: "",
+      username: "",
+      currentId: 0,
       loading: true,
       data: [],
       filteredData: [],
@@ -169,14 +175,6 @@ class App extends React.Component {
     }
   };
 
-  openModal = () => {
-    this.setState({ showModal: true });
-  };
-
-  closeModal = () => {
-    this.setState({ showModal: false });
-  };
-
   logout = () => {
     localStorage.clear();
     lock.logout({
@@ -238,12 +236,24 @@ class App extends React.Component {
   };
 
   componentDidMount = () => {
+    const { token, currentId, username } = this.state;
     if (token) {
       let shouldFetchUpdates = false;
-      if (moment() - moment(localStorage.getItem("lastUpdate")) > 360000) {
+      if (
+        !localStorage.getItem("lastUpdate") ||
+        moment() - moment(localStorage.getItem("lastUpdate")) > 360000
+      ) {
         shouldFetchUpdates = true;
       }
-      // if (shouldFetchUpdates || !localStorage.getItem('lastUpdate')) {
+      if (
+        !shouldFetchUpdates &&
+        localStorage.getItem(`${currentId}:sessionData`)
+      ) {
+        return this.setState({
+          ...JSON.parse(localStorage.getItem(`${currentId}:sessionData`)),
+          loading: false
+        });
+      }
       fetch("/api/orders/" + currentId)
         .then(res => res.json())
         .then(json => {
@@ -277,6 +287,10 @@ class App extends React.Component {
             .then(json => this.setState({ customers: json.users }))
             .then(() => {
               localStorage.setItem("lastUpdate", moment());
+              localStorage.setItem(
+                `${currentId}:sessionData`,
+                JSON.stringify(this.state)
+              );
               this.setState({
                 loading: false
               });
@@ -286,19 +300,11 @@ class App extends React.Component {
         .catch(err => {
           console.error(err);
         });
-      // } else {
-      //   //use locally stored data
-      //   db.get('sessionData').then((doc) => {
-      //     this.setState({
-      //       ...doc,
-      //       loading: false
-      //     })
-      //   });
-      // }
     }
   };
 
   render() {
+    const { token } = this.state;
     if (token) {
       if (!this.state.loading) {
         let {
@@ -647,6 +653,7 @@ class App extends React.Component {
       }
     } else {
       lock.show();
+      return null;
     }
   }
 }

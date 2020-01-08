@@ -91,9 +91,7 @@ export default class ApproveDeny extends React.Component {
       return (
         <div>
           <Table headers={headers} tableData={tableData} />
-          <Button className="btn-success" onClick={this.handleSubmit}>
-            Submit
-          </Button>
+          <Button onClick={this.handleSubmit}>Submit</Button>
           <DetailModal
             modalTitle={modalTitle}
             modalData={modalData}

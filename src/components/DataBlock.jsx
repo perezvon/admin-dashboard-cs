@@ -4,18 +4,18 @@ import styled from "styled-components";
 const DataContainer = styled.div`
   border-radius: 5px;
   margin: 10px;
-  width: 300px;
-  height: 250px;
+  width: 200px;
+  height: 150px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #eaeaea;
+  background: white;
 `;
 
-const LabelText = styled.h2``;
+const LabelText = styled.h3``;
 
-const ValueText = styled.h2`
+const ValueText = styled.h1`
   color: green;
 `;
 
