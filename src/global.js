@@ -58,6 +58,9 @@ export function getStoreID (username) {
     case 'ighpd':
       return 23;
       break;
+    case 'allinaems':
+      return 13;
+      break;
     default:
       return 0;
   }
@@ -146,6 +149,12 @@ export function getCompanyInfo(id) {
         return {
           companyName: 'Lake Johanna Fire',
           logo: 'lakejofire.jpg',
+          maxSpend: 0
+        }
+      case 13:
+        return {
+          companyName: 'Allina EMS',
+          logo: 'allina.gif',
           maxSpend: 0
         }
       case 14:
