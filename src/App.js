@@ -37,38 +37,32 @@ const lock = new Auth0Lock(
     allowedConnections: ["Username-Password-Authentication"],
     languageDictionary: {
       usernameOrEmailInputPlaceholder: "username",
-      title: "QM Dashboard"
+      title: "Quartermaster Dashboard"
     }
   }
 );
 
+lock.on("authenticated", function(authResult) {
+  // Use the token in authResult to getUserInfo() and save it to localStorage
+  lock.getUserInfo(authResult.accessToken, (error, profile) => {
+    if (error) {
+      console.log(error);
+      return;
+    }
+    localStorage.setItem("accessToken", authResult.accessToken);
+    localStorage.setItem("username", profile.username);
+    localStorage.setItem("profile", profile.app_metadata);
+  });
+});
+
+const token = localStorage.getItem("accessToken");
+const username = localStorage.getItem("username");
+const currentId = getStoreID(username);
+
 class App extends React.Component {
   constructor(props) {
     super(props);
-    const self = this;
-    lock.on("authenticated", function(authResult) {
-      // Use the token in authResult to getUserInfo() and save it to localStorage
-      lock.getUserInfo(authResult.accessToken, (error, profile) => {
-        if (error) {
-          console.log(error);
-          return;
-        }
-        localStorage.setItem("accessToken", authResult.accessToken);
-        localStorage.setItem("username", profile.username);
-        localStorage.setItem("profile", profile.app_metadata);
-
-        self.setState({
-          token: localStorage.getItem("accessToken"),
-          username: localStorage.getItem("username"),
-          currentId: getStoreID(profile.username)
-        });
-      });
-    });
-
     this.state = {
-      token: "",
-      username: "",
-      currentId: 0,
       loading: true,
       data: [],
       filteredData: [],
@@ -236,12 +230,11 @@ class App extends React.Component {
   };
 
   componentDidMount = () => {
-    const { token, currentId, username } = this.state;
     if (token) {
       let shouldFetchUpdates = false;
       if (
         !localStorage.getItem("lastUpdate") ||
-        moment() - moment(localStorage.getItem("lastUpdate")) > 360000
+        moment() - moment(localStorage.getItem("lastUpdate")) > 3600000
       ) {
         shouldFetchUpdates = true;
       }
@@ -304,7 +297,6 @@ class App extends React.Component {
   };
 
   render() {
-    const { token } = this.state;
     if (token) {
       if (!this.state.loading) {
         let {

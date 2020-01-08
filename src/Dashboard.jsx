@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import moment from "moment";
 import { Table } from "./components/Table";
 import { UserSpendChart } from "./UserSpendChart";
@@ -13,7 +13,12 @@ import styled from "styled-components";
 
 const DashboardContainer = styled(Box)`
   background: #f2f2f2;
+  min-height: 100vh;
 `;
+
+const StyledSelect = styled(Select)`
+  max-width: 300px;
+  `
 
 export const Dashboard = ({
   logo,
@@ -46,14 +51,15 @@ export const Dashboard = ({
   setActiveOrder,
   logout
 }) => {
+  const [showOrders, setShowOrders] = useState('all');
+  console.log(showOrders)
   const formattedYear = moment.isMoment(year)
     ? moment(year).format("YYYY")
     : year;
   const yearSelect = (
-    <Select
-      style={{ width: "200px" }}
+    <StyledSelect
       value={formattedYear}
-      onChange={e => handleYear(e.target.value)}
+      onChange={({ option }) => handleYear(option)}
       options={["all", 2020, 2019, 2018]}
       placeholder="select"
     />
@@ -94,18 +100,27 @@ export const Dashboard = ({
                       handleFilter={handleFilter}
                     />
                   )}
-                  <Table headers={userHeaders} tableData={userSpendData} />
-                  <Table headers={headers} tableData={tableData} />
-                  <DetailModal
-                    modalTitle={modalTitle}
-                    modalData={modalData}
-                    userDetails={userDetails}
-                    showModal={showModal}
-                    openModal={openModal}
-                    closeModal={closeModal}
-                  />
+                  
                 </div>
               )}
+            </Tab>
+            <Tab title="Orders">
+              <StyledSelect
+                value={showOrders}
+                onChange={({option}) => setShowOrders(option)}
+                options={['all', 'employee']}
+                placeholder="select"
+              />
+              {showOrders === 'employee' && <Table headers={userHeaders} tableData={userSpendData} />}
+              {showOrders === 'all' && <Table headers={headers} tableData={tableData} />}
+              <DetailModal
+                modalTitle={modalTitle}
+                modalData={modalData}
+                userDetails={userDetails}
+                showModal={showModal}
+                openModal={openModal}
+                closeModal={closeModal}
+              />
             </Tab>
             {approve && (
               <Tab title="Approve/Deny Orders">

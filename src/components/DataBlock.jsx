@@ -13,9 +13,12 @@ const DataContainer = styled.div`
   background: white;
 `;
 
-const LabelText = styled.h3``;
+const LabelText = styled.h3`
+  text-align: center;
+  `;
 
 const ValueText = styled.h1`
+text-align: center;
   color: green;
 `;
 
