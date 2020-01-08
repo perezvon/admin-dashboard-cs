@@ -1,6 +1,6 @@
 import React from "react";
-import { Table } from "./Table";
-import { TextArea } from "grommet";
+import { Table } from "./components/Table";
+import { TextArea, TableRow, TableCell } from "grommet";
 import { DetailModal } from "./DetailModal";
 import { Button } from "grommet";
 
@@ -62,13 +62,13 @@ export default class ApproveDeny extends React.Component {
       <td>{i}</td>
     ));
     const tableData = data.map((i, index) => (
-      <tr key={i.order_id} data-order={i.order_id}>
-        <td onClick={setActiveOrder}>{i.order_id}</td>
-        <td onClick={setActiveOrder}>
+      <TableRow key={i.order_id} data-order={i.order_id}>
+        <TableCell onClick={setActiveOrder}>{i.order_id}</TableCell>
+        <TableCell onClick={setActiveOrder}>
           {i.b_firstname ? i.b_firstname + " " + i.b_lastname : i.email}
-        </td>
-        <td onClick={setActiveOrder}>{`$${i.total}`}</td>
-        <td>
+        </TableCell>
+        <TableCell onClick={setActiveOrder}>{`$${i.total}`}</TableCell>
+        <TableCell>
           <label className="switch">
             <input
               type="checkbox"
@@ -77,15 +77,15 @@ export default class ApproveDeny extends React.Component {
             />
             <span className="slider round"></span>
           </label>
-        </td>
-        <td>
+        </TableCell>
+        <TableCell>
           <TextArea
             placeholder="Enter notes for employee here (optional)"
             value={i.approve_deny_notes}
             onChange={e => this.handleInput(e, index)}
           ></TextArea>
-        </td>
-      </tr>
+        </TableCell>
+      </TableRow>
     ));
     if (data.length > 0) {
       return (
