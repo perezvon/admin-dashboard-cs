@@ -44,6 +44,7 @@ const yearSelect = <FormGroup controlId="formControlsSelect">
   <ControlLabel>Filter by Year:</ControlLabel>
   <FormControl style={{width: '200px'}} value={formattedYear} onChange={e => handleYear(e.target.value)} componentClass="select" placeholder="select">
     <option value='all'>all</option>
+    <option value={'2020'}>2020</option>
     <option value={'2019'}>2019</option>
     <option value={'2018'}>2018</option>
   </FormControl>
