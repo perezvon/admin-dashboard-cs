@@ -15,9 +15,15 @@ import {
 import moment from "moment";
 import { Grommet, TableRow, TableCell } from "grommet";
 import DataBlock from "./components/DataBlock";
+import styled from 'styled-components';
 
+const ClickableTableRow = styled(TableRow)`
+  cursor: pointer;
+  &:hover {
+    background: white;
+  }
+`
 //global grommet theming
-
 const theme = {
   global: {
     font: {
@@ -99,6 +105,8 @@ class App extends React.Component {
       showModal: true
     });
   };
+  
+  setShowModal = val => this.setState({showModal: val})
 
   getWalletBalance = user => {
     let userBalance = this.state.data
@@ -334,9 +342,7 @@ class App extends React.Component {
         let modalData, modalTitle;
         let userTotals = [];
         let dropdownItems;
-        const selectedYear = moment.isMoment(this.state.year)
-          ? moment(this.state.year).format("YYYY")
-          : this.state.year;
+        const selectedYear = this.state.year === 'all' ? this.state.year : moment(this.state.year).format("YYYY");
         const customerIDs = [
           ...new Set(this.state.customers.map(item => item.user_id))
         ];
@@ -355,7 +361,7 @@ class App extends React.Component {
             : i.email;
           let shipping = +i.display_shipping_cost;
           let tax = +i.tax_subtotal;
-          let subtotal = i.subtotal;
+          let subtotal = +i.subtotal;
           let total = +i.total || shipping + tax + subtotal;
           orderTotals.push({
             orderNumber: orderNumber,
@@ -445,7 +451,7 @@ class App extends React.Component {
         ));
         tableData = sortedOrders.map((item, index) => {
           return (
-            <TableRow
+            <ClickableTableRow
               key={item.orderNumber}
               data-order={item.orderNumber}
               onClick={this.setActiveOrder}
@@ -453,7 +459,7 @@ class App extends React.Component {
               {_.map(item, (i, key) => (
                 <TableCell key={key}>{i}</TableCell>
               ))}
-            </TableRow>
+            </ClickableTableRow>
           );
         });
         //format users for user spend table
@@ -464,7 +470,7 @@ class App extends React.Component {
         ));
         userSpendData = _.uniq(orderTotals, "name").map((item, index) => {
           return (
-            <TableRow
+            <ClickableTableRow
               key={item.name}
               data-user={item.name}
               onClick={this.setActiveUser}
@@ -474,7 +480,7 @@ class App extends React.Component {
                   <TableCell key={i}>{i}</TableCell>
                 ) : null;
               })}
-            </TableRow>
+            </ClickableTableRow>
           );
         });
 
@@ -538,13 +544,13 @@ class App extends React.Component {
                 //strip html and options from item description
                 let description = item.product.split("<", 1)[0];
                 return (
-                  <tr key={index}>
-                    <td>{item.product_code}</td>
-                    <td>{description}</td>
-                    <td>${+item.price}</td>
-                    <td>{item.amount}</td>
-                    <td>${+(item.price * item.amount).toFixed(2)}</td>
-                  </tr>
+                  <TableRow key={index}>
+                    <TableCell>{item.product_code}</TableCell>
+                    <TableCell>{description}</TableCell>
+                    <TableCell>${(+item.price).toFixed(2)}</TableCell>
+                    <TableCell>{item.amount}</TableCell>
+                    <TableCell>${+(item.price * item.amount).toFixed(2)}</TableCell>
+                  </TableRow>
                 );
               })
             : orderData;
@@ -614,8 +620,7 @@ class App extends React.Component {
                       modalData={modalData}
                       userDetails={userDetails}
                       showModal={showModal}
-                      openModal={this.openModal}
-                      closeModal={this.closeModal}
+                      setShowModal={this.setShowModal}
                       setActiveOrder={this.setActiveOrder}
                       filter={getFilterFieldName(filter)}
                       year={this.state.year}

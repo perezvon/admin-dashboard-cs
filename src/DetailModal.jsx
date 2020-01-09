@@ -1,42 +1,59 @@
 import React from "react";
 import { UserDetails } from "./UserDetails";
-import { Button, Layer } from "grommet";
+import { Button, Layer, Table, TableHeader, TableBody, TableRow, TableCell } from "grommet";
 import styled from "styled-components";
 
 const StyledLayer = styled(Layer)`
-  padding: 20px;
+  padding: 20px 30px 30px 30px;
 `;
+
+const CloseButton = styled(Button)`
+  background: #f25454;
+  color: white;
+  border-radius: 100px;
+  padding: 8px 15px;
+  transition: background 0.3s;
+  &:hover {
+    background: #bc3232; 
+  }
+`
+
+const Footer = styled.footer`
+  display: flex;
+  justify-content: flex-end;
+`
 
 export const DetailModal = ({
   modalTitle,
   modalData,
   showModal,
-  openModal,
-  closeModal,
+  setShowModal,
   userDetails
 }) =>
   showModal && (
-    <StyledLayer bsSize="large" aria-labelledby="contained-modal-title-lg">
+    <StyledLayer
+      onEsc={() => setShowModal(false)}
+      onClickOutside={() => setShowModal(false)}>
       <header>
         <h2>{modalTitle}</h2>
       </header>
       <main>
         {userDetails && <UserDetails userDetails={userDetails} />}
-        <table className="table table-responsive table-bordered table-striped">
-          <thead className="thead-default">
-            <tr>
-              <th>Product Number</th>
-              <th>Product Name</th>
-              <th>Price</th>
-              <th>QTY</th>
-              <th>Subtotal</th>
-            </tr>
-          </thead>
-          <tbody>{modalData}</tbody>
-        </table>
+        <Table>
+          <TableHeader className="thead-default">
+            <TableRow>
+              <TableCell>Product Number</TableCell>
+              <TableCell>Product Name</TableCell>
+              <TableCell>Price</TableCell>
+              <TableCell>QTY</TableCell>
+              <TableCell>Subtotal</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>{modalData}</TableBody>
+        </Table>
       </main>
-      <footer>
-        <Button onClick={closeModal}>Close</Button>
-      </footer>
+      <Footer>
+        <CloseButton onClick={() => setShowModal(false)}>Close</CloseButton>
+      </Footer>
     </StyledLayer>
   );

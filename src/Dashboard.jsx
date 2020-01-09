@@ -16,6 +16,20 @@ const DashboardContainer = styled(Box)`
   min-height: 100vh;
 `;
 
+const PaddedSelectContainer = styled.div`
+  padding-left: 20px;
+`
+
+const ResponsiveBox = styled(Box)`
+  @media (max-width: 732px) {
+    flex-flow: wrap;
+  }
+`
+
+const PaddedBox = styled(Box)`
+  padding: 20px;
+  `
+
 const StyledSelect = styled(Select)`
   max-width: 300px;
   `
@@ -38,8 +52,7 @@ export const Dashboard = ({
   modalData,
   userDetails,
   showModal,
-  openModal,
-  closeModal,
+  setShowModal,
   filter,
   approve,
   orderData,
@@ -52,10 +65,7 @@ export const Dashboard = ({
   logout
 }) => {
   const [showOrders, setShowOrders] = useState('all');
-  console.log(showOrders)
-  const formattedYear = moment.isMoment(year)
-    ? moment(year).format("YYYY")
-    : year;
+  const formattedYear = year === 'all' ? year : moment(year).format("YYYY");
   const yearSelect = (
     <StyledSelect
       value={formattedYear}
@@ -72,15 +82,17 @@ export const Dashboard = ({
         <Button icon={<Logout />} onClick={logout} />
       </Header>
       <DashboardContainer>
-        <Box>
+        <div>
+          <PaddedSelectContainer>
           <p>Filter by Year:</p>
           {yearSelect}
+          </PaddedSelectContainer>
           <Tabs id="qm-tabs" style={{ marginTop: "20px" }}>
             <Tab title="Summary">
               {userData && (
                 <div>
                   <Box>
-                    <Box direction="row" align="center">
+                    <ResponsiveBox direction="row" align="center">
                       <Box direction="row" wrap={true} justify="center">
                         {totalSpend}
                         {spendRemaining}
@@ -91,7 +103,7 @@ export const Dashboard = ({
                         chartData={chartData}
                         tooltipContent={tooltipContent}
                       />
-                    </Box>
+                    </ResponsiveBox>
                   </Box>
                   {filter && (
                     <FilterDropdown
@@ -105,21 +117,25 @@ export const Dashboard = ({
               )}
             </Tab>
             <Tab title="Orders">
-              <StyledSelect
-                value={showOrders}
-                onChange={({option}) => setShowOrders(option)}
-                options={['all', 'employee']}
-                placeholder="select"
-              />
-              {showOrders === 'employee' && <Table headers={userHeaders} tableData={userSpendData} />}
-              {showOrders === 'all' && <Table headers={headers} tableData={tableData} />}
+              <PaddedSelectContainer>
+                <p>View by:</p>
+                <StyledSelect
+                  value={showOrders}
+                  onChange={({option}) => setShowOrders(option)}
+                  options={['all', 'employee']}
+                  placeholder="select"
+                />
+              </PaddedSelectContainer>
+              <PaddedBox>
+                {showOrders === 'employee' && <Table headers={userHeaders} tableData={userSpendData} />}
+                {showOrders === 'all' && <Table headers={headers} tableData={tableData} />}
+              </PaddedBox>
               <DetailModal
                 modalTitle={modalTitle}
                 modalData={modalData}
                 userDetails={userDetails}
                 showModal={showModal}
-                openModal={openModal}
-                closeModal={closeModal}
+                setShowModal={setShowModal}
               />
             </Tab>
             {approve && (
@@ -130,15 +146,14 @@ export const Dashboard = ({
                   modalTitle={modalTitle}
                   modalData={modalData}
                   userDetails={userDetails}
-                  openModal={openModal}
-                  closeModal={closeModal}
+                  setShowModal={setShowModal}
                   showModal={showModal}
                   setActiveOrder={setActiveOrder}
                 />
               </Tab>
             )}
           </Tabs>
-        </Box>
+        </div>
       </DashboardContainer>
     </Grid>
   );
