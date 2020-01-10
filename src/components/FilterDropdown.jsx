@@ -9,9 +9,8 @@ const StyledSelect = styled(Select)`
 export const FilterDropdown = ({ filter, dropdownItems, handleFilter }) => (
   <div>
     <StyledSelect
-      title={filter}
       id="filterBy"
-      onSelect={handleFilter}
+      onChange={({ option }) => handleFilter(option)}
       options={["all", ...dropdownItems]}
     />
   </div>

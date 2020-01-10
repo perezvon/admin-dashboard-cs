@@ -337,7 +337,7 @@ class App extends React.Component {
         let userHeaders, userSpendData;
         let totalOrders = "";
         let totalProductCount = 0;
-        let productsPurchased = "";
+        let averageOrderTotal = "";
         let orderTotals = [];
         let tableData;
         let headers = [];
@@ -491,8 +491,11 @@ class App extends React.Component {
         // for (let i = 0; i < totalProductCount.length; i++) {
         //   numOfProducts += Object.keys(totalProductCount[i]).length;
         // }
-        productsPurchased = (
-          <DataBlock label={"Total Products Purchased"} value={numOfProducts} />
+        averageOrderTotal = (
+          <DataBlock
+            label={"Average Order Total"}
+            value={`$${(companyTotal / approvedOrders.length).toFixed(2)}`}
+          />
         );
 
         //sort user spend data for display
@@ -596,7 +599,7 @@ class App extends React.Component {
                       userHeaders={userHeaders}
                       userSpendData={userSpendData}
                       totalOrders={totalOrders}
-                      productsPurchased={productsPurchased}
+                      averageOrderTotal={averageOrderTotal}
                       chartData={chartData}
                       tooltipContent={tooltipContent}
                       headers={headers}

@@ -47,7 +47,7 @@ export const Dashboard = ({
   userHeaders,
   userSpendData,
   totalOrders,
-  productsPurchased,
+  averageOrderTotal,
   chartData,
   tooltipContent,
   headers,
@@ -87,6 +87,14 @@ export const Dashboard = ({
         <Box direction="row">
           <p>Filter by Year:</p>
           {yearSelect}
+          {filter && dropdownItems.length > 0 && <p>{filter}</p>}
+          {filter && dropdownItems.length > 0 && (
+            <FilterDropdown
+              filter={filter}
+              dropdownItems={dropdownItems}
+              handleFilter={handleFilter}
+            />
+          )}
         </Box>
         <Button icon={<Logout />} onClick={logout} />
       </StyledHeader>
@@ -102,7 +110,7 @@ export const Dashboard = ({
                         {totalSpend}
                         {spendRemaining}
                         {totalOrders}
-                        {productsPurchased}
+                        {averageOrderTotal}
                       </Box>
                       <UserSpendChart
                         chartData={chartData}
@@ -110,13 +118,6 @@ export const Dashboard = ({
                       />
                     </ResponsiveBox>
                   </Box>
-                  {filter && (
-                    <FilterDropdown
-                      filter={filter}
-                      dropdownItems={dropdownItems}
-                      handleFilter={handleFilter}
-                    />
-                  )}
                 </div>
               )}
             </Tab>
