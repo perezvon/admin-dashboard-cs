@@ -293,6 +293,7 @@ class App extends React.Component {
             `${currentId}:sessionData`,
             JSON.stringify(this.state)
           );
+          this.handleYear(this.state.year.format("YYYY"));
         })
         .catch(err => {
           console.error(err);
