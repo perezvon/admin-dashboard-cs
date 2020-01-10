@@ -282,26 +282,15 @@ class App extends React.Component {
           let orderData = json.orders;
           this.setState({
             orders: orderData,
-            ...getCompanyInfo(currentId)
+            ...getCompanyInfo(currentId),
+            loading: false
           });
+          localStorage.setItem("lastUpdate", moment());
+          localStorage.setItem(
+            `${currentId}:sessionData`,
+            JSON.stringify(this.state)
+          );
         })
-        // .then(() => {
-        //   fetch(`/api/users/${currentId}`)
-        //     .then(res => res.json())
-        //     .then(json => this.setState({ customers: json.users }))
-        //     .then(() => {
-        //       localStorage.setItem("lastUpdate", moment());
-        //       localStorage.setItem(
-        //         `${currentId}:sessionData`,
-        //         JSON.stringify(this.state)
-        //       );
-        //       this.setState({
-        //         loading: false
-        //       });
-        //       this.handleYear(this.state.year);
-        //     })
-        //     .catch(err => console.error(err));
-        // })
         .catch(err => {
           console.error(err);
           this.setState({ apiError: true });
@@ -579,7 +568,7 @@ class App extends React.Component {
           userTotals.filter(item => item.user_id === this.state.activeUser)
         );
         const approveOrderData = orders.filter(o => o.status === "O");
-        modalData = currentOrderData.order_id ? orderData : userOrderData;
+        modalData = currentOrderData.order_id ? orderData : null; //userOrderData;
         modalTitle = currentOrderData.order_id
           ? "Order #" + currentOrderData.order_id
           : "Shopper Profile for " + (userDetails || {}).name;

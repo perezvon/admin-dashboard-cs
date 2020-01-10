@@ -71,18 +71,20 @@ export const DetailModal = ({
           </header>
           <main>
             {userDetails && <UserDetails userDetails={userDetails} />}
-            <Table>
-              <TableHeader className="thead-default">
-                <TableRow>
-                  <TableCell>Product Number</TableCell>
-                  <TableCell>Product Name</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>QTY</TableCell>
-                  <TableCell>Subtotal</TableCell>
-                </TableRow>
-              </TableHeader>
-              <TableBody>{modalData}</TableBody>
-            </Table>
+            {modalData && (
+              <Table>
+                <TableHeader className="thead-default">
+                  <TableRow>
+                    <TableCell>Product Number</TableCell>
+                    <TableCell>Product Name</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell>QTY</TableCell>
+                    <TableCell>Subtotal</TableCell>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>{modalData}</TableBody>
+              </Table>
+            )}
           </main>
           <Footer>
             <CloseButton onClick={() => setShowModal(false)}>Close</CloseButton>
