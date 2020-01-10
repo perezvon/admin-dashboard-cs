@@ -1,6 +1,6 @@
 import React from "react";
 import { UserDetails } from "./UserDetails";
-import { LoadingSpinner } from "./components/LoadingSpinner";
+import LoadingSpinner from "./components/LoadingSpinner";
 import {
   Button,
   Layer,
