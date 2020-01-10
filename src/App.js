@@ -98,6 +98,9 @@ class App extends React.Component {
     const order = e.target.parentNode.attributes.getNamedItem("data-order")
       .value;
     this.asyncGetOrderDetails(order);
+    this.setState({
+      activeUser: 0
+    });
   };
 
   setActiveUser = e => {
@@ -542,13 +545,11 @@ class App extends React.Component {
 
         //get data for current customer
         if (this.state.activeUser) {
-          console.log(userOrderData);
           userOrderData = approvedOrders
             .filter(order => {
               return +order.user_id === this.state.activeUser;
             })
             .map(item => item.products);
-          console.log(userOrderData);
           userOrderData = _.map(userOrderData, (order, index) => {
             return _.map(order, (item, index) => {
               let description = item.product.split("<", 1)[0];

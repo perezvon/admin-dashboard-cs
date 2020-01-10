@@ -71,7 +71,7 @@ export const DetailModal = ({
           </header>
           <main>
             {userDetails && <UserDetails userDetails={userDetails} />}
-            {modalData && (
+            {modalData && modalData.length > 0 && (
               <Table>
                 <TableHeader className="thead-default">
                   <TableRow>
