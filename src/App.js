@@ -446,9 +446,11 @@ class App extends React.Component {
               data-order={item.orderNumber}
               onClick={this.setActiveOrder}
             >
-              {_.map(item, (i, key) => (
-                <TableCell key={key}>{i}</TableCell>
-              ))}
+              {_.map(
+                item,
+                (i, key) =>
+                  key !== "user_id" && <TableCell key={key}>{i}</TableCell>
+              )}
             </ClickableTableRow>
           );
         });
@@ -568,7 +570,7 @@ class App extends React.Component {
           userTotals.filter(item => item.user_id === this.state.activeUser)
         );
         const approveOrderData = orders.filter(o => o.status === "O");
-        modalData = currentOrderData.order_id ? orderData : null; //userOrderData;
+        modalData = currentOrderData.order_id ? orderData : userOrderData;
         modalTitle = currentOrderData.order_id
           ? "Order #" + currentOrderData.order_id
           : "Shopper Profile for " + (userDetails || {}).name;

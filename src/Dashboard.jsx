@@ -11,6 +11,10 @@ import { Header, Grid, Button, Tabs, Tab, Box, Select } from "grommet";
 import { Logout } from "grommet-icons";
 import styled from "styled-components";
 
+const StyledHeader = styled(Header)`
+  padding: 0 20px;
+`;
+
 const DashboardContainer = styled(Box)`
   background: #f2f2f2;
   min-height: 100vh;
@@ -78,16 +82,16 @@ export const Dashboard = ({
   // const activeKey = orderData.length > 0 ? 2 : 1;
   return (
     <Grid>
-      <Header>
-        <h1>{logo ? <Logo logo={logo} /> : { companyName }}</h1>
+      <StyledHeader>
+        <h1>{logo ? <Logo logo={logo} height="65px" /> : { companyName }}</h1>
+        <Box direction="row">
+          <p>Filter by Year:</p>
+          {yearSelect}
+        </Box>
         <Button icon={<Logout />} onClick={logout} />
-      </Header>
+      </StyledHeader>
       <DashboardContainer>
         <div>
-          <PaddedSelectContainer>
-            <p>Filter by Year:</p>
-            {yearSelect}
-          </PaddedSelectContainer>
           <Tabs id="qm-tabs" style={{ marginTop: "20px" }}>
             <Tab title="Summary">
               {userData && (
