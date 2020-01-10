@@ -15,14 +15,14 @@ import {
 import moment from "moment";
 import { Grommet, TableRow, TableCell } from "grommet";
 import DataBlock from "./components/DataBlock";
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const ClickableTableRow = styled(TableRow)`
   cursor: pointer;
   &:hover {
     background: white;
   }
-`
+`;
 //global grommet theming
 const theme = {
   global: {
@@ -34,7 +34,7 @@ const theme = {
   }
 };
 
-const fromUrl = document.referrer || "https://qm-dashboard.herokuapp.com";
+const fromUrl = window.location.href || "https://qm-dashboard.herokuapp.com";
 
 const lock = new Auth0Lock(
   process.env.REACT_APP_AUTH0_KEY,
@@ -89,11 +89,8 @@ class App extends React.Component {
     e.preventDefault();
     const order = e.target.parentNode.attributes.getNamedItem("data-order")
       .value;
-    this.setState({
-      activeOrder: order,
-      activeUser: "",
-      showModal: true
-    });
+    console.log(order);
+    this.asyncGetOrderDetails(order);
   };
 
   setActiveUser = e => {
@@ -105,8 +102,8 @@ class App extends React.Component {
       showModal: true
     });
   };
-  
-  setShowModal = val => this.setState({showModal: val})
+
+  setShowModal = val => this.setState({ showModal: val });
 
   getWalletBalance = user => {
     let userBalance = this.state.data
@@ -189,7 +186,7 @@ class App extends React.Component {
       this.setState(prevState => {
         return {
           filterBy: eventKey,
-          filteredData: prevState.data.filter(
+          filteredData: prevState.orders.filter(
             i => i.fields[prevState.filter] === eventKey
           )
         };
@@ -197,25 +194,23 @@ class App extends React.Component {
     } else
       this.setState({
         filterBy: eventKey,
-        filteredData: this.state.data
+        filteredData: this.state.orders
       });
   };
 
   handleYear = year => {
     if (year !== "all") {
       const formattedYear = moment(`01/01/${year}`);
-      this.setState(prevState => {
-        return {
-          year: formattedYear,
-          filteredData: prevState.data.filter(d =>
-            moment.unix(+d.timestamp).isSame(formattedYear, "year")
-          )
-        };
-      });
+      this.setState(prevState => ({
+        year: formattedYear,
+        filteredData: prevState.orders.filter(d =>
+          moment.unix(+d.timestamp).isSame(formattedYear, "year")
+        )
+      }));
     } else
       this.setState({
         year: "all",
-        filteredData: this.state.data
+        filteredData: this.state.orders
       });
   };
 
@@ -237,6 +232,19 @@ class App extends React.Component {
       .catch(err => console.error(err));
   };
 
+  asyncGetOrderDetails = order_id => {
+    fetch(`/api/orders/${currentId}/${order_id}`)
+      .then(res => res.json())
+      .then(json => {
+        this.setState({
+          currentOrderData: json
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  };
+
   componentDidMount = () => {
     if (token) {
       let shouldFetchUpdates = false;
@@ -255,35 +263,17 @@ class App extends React.Component {
           loading: false
         });
       }
-      fetch("/api/orders/" + currentId)
+      fetch(`/api/orders/${currentId}`)
         .then(res => res.json())
         .then(json => {
           let orderData = json.orders;
-          this.setState({ orders: orderData });
-          this.setState(getCompanyInfo(currentId));
-        })
-        .then(() => {
-          this.state.orders.forEach(order => {
-            fetch("/api/orders/" + currentId + "/" + order.order_id)
-              .then(res => res.json())
-              .then(json => {
-                let data = this.state.data;
-                // if (moment.unix(+json.timestamp).isSame(this.state.year, 'year'))
-                data.push(json);
-                this.setState({
-                  data: data,
-                  filteredData: data.filter(d =>
-                    moment.unix(+d.timestamp).isSame(this.state.year, "year")
-                  )
-                });
-              })
-              .catch(err => {
-                console.error(err);
-              });
+          this.setState({
+            orders: orderData,
+            ...getCompanyInfo(currentId)
           });
         })
         .then(() => {
-          fetch("/api/users/" + currentId)
+          fetch(`/api/users/${currentId}`)
             .then(res => res.json())
             .then(json => this.setState({ customers: json.users }))
             .then(() => {
@@ -307,24 +297,30 @@ class App extends React.Component {
   render() {
     if (token) {
       if (!this.state.loading) {
-        let {
+        const {
           data,
           filteredData,
           userDetails,
           filter,
+          filterFields,
+          filterBy,
           showModal,
           approve,
-          logo
+          logo,
+          orders,
+          year,
+          customers
         } = this.state;
+        console.log(this.state);
         let orderData, userOrderData;
         let companyName =
-          this.state.filterBy !== "all"
-            ? this.state.companyName +
+          filterBy !== "all"
+            ? companyName +
               " — " +
-              getFilterFieldName(this.state.filter) +
+              getFilterFieldName(filter) +
               " " +
-              this.state.filterFields[this.state.filterBy].split(" ")[0]
-            : this.state.companyName;
+              filterFields[filterBy].split(" ")[0]
+            : companyName;
         let chartData = [];
         let tooltipContent;
         let companyTotal = 0;
@@ -342,10 +338,9 @@ class App extends React.Component {
         let modalData, modalTitle;
         let userTotals = [];
         let dropdownItems;
-        const selectedYear = this.state.year === 'all' ? this.state.year : moment(this.state.year).format("YYYY");
-        const customerIDs = [
-          ...new Set(this.state.customers.map(item => item.user_id))
-        ];
+        const selectedYear =
+          year === "all" ? year : moment(year).format("YYYY");
+        const customerIDs = [...new Set(customers.map(item => item.user_id))];
         let currentData = filteredData.filter(
           i => customerIDs.indexOf(i.user_id) !== -1
         );
@@ -359,17 +354,11 @@ class App extends React.Component {
           let username = i.b_firstname
             ? i.b_firstname + " " + i.b_lastname
             : i.email;
-          let shipping = +i.display_shipping_cost;
-          let tax = +i.tax_subtotal;
-          let subtotal = +i.subtotal;
-          let total = +i.total || shipping + tax + subtotal;
+          let total = +i.total;
           orderTotals.push({
             orderNumber: orderNumber,
             date: date,
             name: username,
-            subtotal: subtotal,
-            shipping: shipping,
-            tax: tax,
             total: total
           });
         });
@@ -436,19 +425,13 @@ class App extends React.Component {
         );
 
         //format orders for order table
-        headers = [
-          "Order Number",
-          "Order Date",
-          "Employee",
-          "Subtotal",
-          "Shipping",
-          "Tax",
-          "Total"
-        ].map((item, index) => (
-          <TableCell key={index} data-sort={item} onClick={this.sortFactor}>
-            {item}
-          </TableCell>
-        ));
+        headers = ["Order Number", "Order Date", "Employee", "Total"].map(
+          (item, index) => (
+            <TableCell key={index} data-sort={item} onClick={this.sortFactor}>
+              {item}
+            </TableCell>
+          )
+        );
         tableData = sortedOrders.map((item, index) => {
           return (
             <ClickableTableRow
@@ -490,11 +473,11 @@ class App extends React.Component {
         );
 
         //total products purchased
-        totalProductCount = approvedOrders.map(i => i.products);
+        // totalProductCount = approvedOrders.map(i => i.products);
         let numOfProducts = 0;
-        for (let i = 0; i < totalProductCount.length; i++) {
-          numOfProducts += Object.keys(totalProductCount[i]).length;
-        }
+        // for (let i = 0; i < totalProductCount.length; i++) {
+        //   numOfProducts += Object.keys(totalProductCount[i]).length;
+        // }
         productsPurchased = (
           <DataBlock label={"Total Products Purchased"} value={numOfProducts} />
         );
@@ -549,7 +532,9 @@ class App extends React.Component {
                     <TableCell>{description}</TableCell>
                     <TableCell>${(+item.price).toFixed(2)}</TableCell>
                     <TableCell>{item.amount}</TableCell>
-                    <TableCell>${+(item.price * item.amount).toFixed(2)}</TableCell>
+                    <TableCell>
+                      ${+(item.price * item.amount).toFixed(2)}
+                    </TableCell>
                   </TableRow>
                 );
               })
@@ -571,13 +556,15 @@ class App extends React.Component {
             return _.map(order, (item, index) => {
               let description = item.product.split("<", 1)[0];
               return (
-                <tr key={index}>
-                  <td>{item.product_code}</td>
-                  <td>{description}</td>
-                  <td>${+item.price}</td>
-                  <td>{item.amount}</td>
-                  <td>${+(item.price * item.amount).toFixed(2)}</td>
-                </tr>
+                <TableRow key={index}>
+                  <TableCell>{item.product_code}</TableCell>
+                  <TableCell>{description}</TableCell>
+                  <TableCell>${+item.price}</TableCell>
+                  <TableCell>{item.amount}</TableCell>
+                  <TableCell>
+                    ${+(item.price * item.amount).toFixed(2)}
+                  </TableCell>
+                </TableRow>
               );
             });
           });
