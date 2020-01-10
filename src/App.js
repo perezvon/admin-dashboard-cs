@@ -9,12 +9,12 @@ import {
   sortCollection,
   getCompanyInfo,
   getStoreID,
-  getFilterFieldName,
-  validateEmail
+  getFilterFieldName
 } from "./global";
 import moment from "moment";
 import { Grommet, Box, TableRow, TableCell } from "grommet";
 import DataBlock from "./components/DataBlock";
+import LoadingSpinner from "./components/LoadingSpinner";
 import styled from "styled-components";
 
 const ClickableTableRow = styled(TableRow)`
@@ -22,6 +22,12 @@ const ClickableTableRow = styled(TableRow)`
   &:hover {
     background: white;
   }
+`;
+
+const LoadingContainer = styled(Box)`
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
 `;
 //global grommet theming
 const theme = {
@@ -79,9 +85,9 @@ class App extends React.Component {
       year: moment(),
       filter: "",
       filterBy: "all",
+      sort: "orderNumber",
       reverse: true,
       userTotals: [],
-      customerIDs: [],
       filterFields: {},
       currentOrderData: {}
     };
@@ -91,7 +97,6 @@ class App extends React.Component {
     e.preventDefault();
     const order = e.target.parentNode.attributes.getNamedItem("data-order")
       .value;
-    console.log(order);
     this.asyncGetOrderDetails(order);
   };
 
@@ -100,7 +105,7 @@ class App extends React.Component {
     const user = e.target.parentNode.attributes.getNamedItem("data-user").value;
     this.setState({
       activeUser: user,
-      activeOrder: 0,
+      currentOrderData: {},
       showModal: true
     });
   };
@@ -280,25 +285,26 @@ class App extends React.Component {
             ...getCompanyInfo(currentId)
           });
         })
-        .then(() => {
-          fetch(`/api/users/${currentId}`)
-            .then(res => res.json())
-            .then(json => this.setState({ customers: json.users }))
-            .then(() => {
-              localStorage.setItem("lastUpdate", moment());
-              localStorage.setItem(
-                `${currentId}:sessionData`,
-                JSON.stringify(this.state)
-              );
-              this.setState({
-                loading: false
-              });
-              this.handleYear(this.state.year);
-            })
-            .catch(err => console.error(err));
-        })
+        // .then(() => {
+        //   fetch(`/api/users/${currentId}`)
+        //     .then(res => res.json())
+        //     .then(json => this.setState({ customers: json.users }))
+        //     .then(() => {
+        //       localStorage.setItem("lastUpdate", moment());
+        //       localStorage.setItem(
+        //         `${currentId}:sessionData`,
+        //         JSON.stringify(this.state)
+        //       );
+        //       this.setState({
+        //         loading: false
+        //       });
+        //       this.handleYear(this.state.year);
+        //     })
+        //     .catch(err => console.error(err));
+        // })
         .catch(err => {
           console.error(err);
+          this.setState({ apiError: true });
         });
     }
   };
@@ -319,7 +325,6 @@ class App extends React.Component {
           logo,
           orders,
           year,
-          customers,
           currentOrderData
         } = this.state;
         let orderData, userOrderData;
@@ -350,26 +355,30 @@ class App extends React.Component {
         let dropdownItems;
         const selectedYear =
           year === "all" ? year : moment(year).format("YYYY");
-        const customerIDs = [...new Set(customers.map(item => item.user_id))];
-        let currentData = filteredData.filter(
-          i => customerIDs.indexOf(i.user_id) !== -1
-        );
         let approvedOrders = this.state.approve
-          ? currentData.filter(i => i.status === "P")
-          : currentData.filter(i => i.status !== "I");
+          ? filteredData.filter(i => i.status === "P")
+          : filteredData.filter(i => i.status !== "I");
         //populate orders array
-        approvedOrders.forEach(i => {
-          let orderNumber = i.order_id;
-          let date = moment.unix(i.timestamp).format("MMMM DD, YYYY");
-          let username = i.b_firstname
-            ? i.b_firstname + " " + i.b_lastname
-            : i.email;
-          let total = +i.total;
+        approvedOrders.forEach(order => {
+          let {
+            order_id,
+            user_id,
+            timestamp,
+            firstname,
+            lastname,
+            email,
+            total
+          } = order;
+          let orderNumber = order_id;
+          let date = moment.unix(timestamp).format("MMMM DD, YYYY");
+          let name = firstname ? `${firstname} ${lastname}` : email;
+          total = +total;
           orderTotals.push({
-            orderNumber: orderNumber,
-            date: date,
-            name: username,
-            total: total
+            user_id,
+            orderNumber,
+            date,
+            name,
+            total
           });
         });
         //filter menu dropdown items
@@ -394,20 +403,19 @@ class App extends React.Component {
         uniqueUsers.forEach(user => {
           let userWallet = this.getWalletBalance(user) || 0;
           //console.log(userWallet)
-          let userName = approvedOrders.filter(i => i.user_id === user);
-          userName =
-            userName && userName[0].b_firstname
-              ? userName[0].b_firstname + " " + userName[0].b_lastname
-              : userName[0].email;
+          let approvedOrdersForUser = approvedOrders.filter(
+            i => i.user_id === user
+          );
+          const userName =
+            approvedOrdersForUser && approvedOrdersForUser[0].firstname
+              ? `${approvedOrdersForUser[0].firstname} ${approvedOrdersForUser[0].lastname}`
+              : approvedOrdersForUser[0].email;
           let currentTotal = 0;
           let numOfOrders = 0;
           for (let i = 0; i < approvedOrders.length; i++) {
             if (user === approvedOrders[i].user_id) {
               numOfOrders++;
-              let shipping = +approvedOrders[i].display_shipping_cost;
-              let tax = +approvedOrders[i].tax_subtotal;
-              let subtotal = approvedOrders[i].subtotal;
-              let total = +approvedOrders[i].total || shipping + tax + subtotal;
+              let total = +approvedOrders[i].total;
               currentTotal += total;
             }
           }
@@ -422,6 +430,7 @@ class App extends React.Component {
             +userWallet.current_cash || this.state.maxSpend - currentTotal;
           if (userSpendRemaining < 0) userSpendRemaining = 0;
           userTotals.push({
+            user_id: approvedOrdersForUser[0].user_id,
             name: userName,
             orders: numOfOrders,
             total: +currentTotal,
@@ -433,7 +442,6 @@ class App extends React.Component {
           this.state.sort,
           this.state.reverse
         );
-
         //format orders for order table
         headers = ["Order Number", "Order Date", "Employee", "Total"].map(
           (item, index) => (
@@ -461,11 +469,11 @@ class App extends React.Component {
             {item}
           </TableCell>
         ));
-        userSpendData = _.uniq(orderTotals, "name").map((item, index) => {
+        userSpendData = _.uniq(orderTotals, "user_id").map((item, index) => {
           return (
             <ClickableTableRow
-              key={item.name}
-              data-user={item.name}
+              key={item.user_id}
+              data-user={item.user_id}
               onClick={this.setActiveUser}
             >
               {_.map(item, (i, key) => {
@@ -525,7 +533,7 @@ class App extends React.Component {
           );
         });
         //get data for current order
-        if (currentOrderData) {
+        if (currentOrderData.order_id) {
           orderData = _.map(currentOrderData.products || {}, (item, index) => {
             //strip html and options from item description
             let description = item.product.split("<", 1)[0];
@@ -543,15 +551,13 @@ class App extends React.Component {
 
         //get data for current customer
         if (this.state.activeUser) {
+          console.log(userOrderData);
           userOrderData = approvedOrders
-            .filter(item => {
-              let email = validateEmail(this.state.activeUser);
-              let user = email
-                ? item.email
-                : item.firstname + " " + item.lastname;
-              return user === this.state.activeUser;
+            .filter(order => {
+              return +order.user_id === this.state.activeUser;
             })
             .map(item => item.products);
+          console.log(userOrderData);
           userOrderData = _.map(userOrderData, (order, index) => {
             return _.map(order, (item, index) => {
               let description = item.product.split("<", 1)[0];
@@ -570,13 +576,13 @@ class App extends React.Component {
           });
         }
         userDetails = _.first(
-          userTotals.filter(item => item.name === this.state.activeUser)
+          userTotals.filter(item => item.user_id === this.state.activeUser)
         );
-        const approveOrderData = data.filter(o => o.status === "O");
-        modalData = currentOrderData ? orderData : userOrderData;
-        modalTitle = currentOrderData
+        const approveOrderData = orders.filter(o => o.status === "O");
+        modalData = currentOrderData.order_id ? orderData : userOrderData;
+        modalTitle = currentOrderData.order_id
           ? "Order #" + currentOrderData.order_id
-          : "Shopper Profile for " + this.state.activeUser;
+          : "Shopper Profile for " + (userDetails || {}).name;
 
         return (
           <Router>
@@ -625,15 +631,10 @@ class App extends React.Component {
       } else {
         return (
           <Grommet theme={theme}>
-            <Box>
-              <Loading
-                className="loading"
-                type="cylon"
-                color="#222"
-                width="20vw"
-              />
+            <LoadingContainer>
+              <LoadingSpinner size="xlarge" />
               <h1>Loading, please wait...</h1>
-            </Box>
+            </LoadingContainer>
           </Grommet>
         );
       }

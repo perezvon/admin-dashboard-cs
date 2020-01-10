@@ -1,5 +1,6 @@
 import React from "react";
 import { UserDetails } from "./UserDetails";
+import { LoadingSpinner } from "./components/LoadingSpinner";
 import {
   Button,
   Layer,
@@ -10,7 +11,6 @@ import {
   TableCell,
   Box
 } from "grommet";
-import { PowerCycle } from "grommet-icons";
 import styled from "styled-components";
 
 const StyledLayer = styled(Layer)`
@@ -27,19 +27,6 @@ const StyledLayer = styled(Layer)`
 const CenteredBox = styled(Box)`
   justify-content: center;
   align-items: center;
-`;
-
-const LoadingSpinner = styled(PowerCycle)`
-  animation: rotate 2s linear infinite;
-
-  @keyframes rotate {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
 `;
 
 const CloseButton = styled(Button)`

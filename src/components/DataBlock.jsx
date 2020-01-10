@@ -15,10 +15,10 @@ const DataContainer = styled.div`
 
 const LabelText = styled.h3`
   text-align: center;
-  `;
+`;
 
 const ValueText = styled.h1`
-text-align: center;
+  text-align: center;
   color: green;
 `;
 
