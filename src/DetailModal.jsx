@@ -1,10 +1,45 @@
 import React from "react";
 import { UserDetails } from "./UserDetails";
-import { Button, Layer, Table, TableHeader, TableBody, TableRow, TableCell } from "grommet";
+import {
+  Button,
+  Layer,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  Box
+} from "grommet";
+import { PowerCycle } from "grommet-icons";
 import styled from "styled-components";
 
 const StyledLayer = styled(Layer)`
   padding: 20px 30px 30px 30px;
+  min-width: 300px;
+  min-height: 400px;
+  overflow: auto;
+
+  @media (min-width: 650px) {
+    width: 600px;
+  }
+`;
+
+const CenteredBox = styled(Box)`
+  justify-content: center;
+  align-items: center;
+`;
+
+const LoadingSpinner = styled(PowerCycle)`
+  animation: rotate 2s linear infinite;
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 `;
 
 const CloseButton = styled(Button)`
@@ -14,16 +49,17 @@ const CloseButton = styled(Button)`
   padding: 8px 15px;
   transition: background 0.3s;
   &:hover {
-    background: #bc3232; 
+    background: #bc3232;
   }
-`
+`;
 
 const Footer = styled.footer`
   display: flex;
   justify-content: flex-end;
-`
+`;
 
 export const DetailModal = ({
+  modalLoading,
   modalTitle,
   modalData,
   showModal,
@@ -33,27 +69,38 @@ export const DetailModal = ({
   showModal && (
     <StyledLayer
       onEsc={() => setShowModal(false)}
-      onClickOutside={() => setShowModal(false)}>
-      <header>
-        <h2>{modalTitle}</h2>
-      </header>
-      <main>
-        {userDetails && <UserDetails userDetails={userDetails} />}
-        <Table>
-          <TableHeader className="thead-default">
-            <TableRow>
-              <TableCell>Product Number</TableCell>
-              <TableCell>Product Name</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>QTY</TableCell>
-              <TableCell>Subtotal</TableCell>
-            </TableRow>
-          </TableHeader>
-          <TableBody>{modalData}</TableBody>
-        </Table>
-      </main>
-      <Footer>
-        <CloseButton onClick={() => setShowModal(false)}>Close</CloseButton>
-      </Footer>
+      onClickOutside={() => setShowModal(false)}
+    >
+      {modalLoading && (
+        <CenteredBox>
+          <h2>Loading...</h2>
+          <LoadingSpinner size="xlarge" />
+        </CenteredBox>
+      )}
+      {!modalLoading && (
+        <div>
+          <header>
+            <h2>{modalTitle}</h2>
+          </header>
+          <main>
+            {userDetails && <UserDetails userDetails={userDetails} />}
+            <Table>
+              <TableHeader className="thead-default">
+                <TableRow>
+                  <TableCell>Product Number</TableCell>
+                  <TableCell>Product Name</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell>QTY</TableCell>
+                  <TableCell>Subtotal</TableCell>
+                </TableRow>
+              </TableHeader>
+              <TableBody>{modalData}</TableBody>
+            </Table>
+          </main>
+          <Footer>
+            <CloseButton onClick={() => setShowModal(false)}>Close</CloseButton>
+          </Footer>
+        </div>
+      )}
     </StyledLayer>
   );

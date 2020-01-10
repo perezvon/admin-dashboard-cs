@@ -13,7 +13,7 @@ import {
   validateEmail
 } from "./global";
 import moment from "moment";
-import { Grommet, TableRow, TableCell } from "grommet";
+import { Grommet, Box, TableRow, TableCell } from "grommet";
 import DataBlock from "./components/DataBlock";
 import styled from "styled-components";
 
@@ -73,6 +73,7 @@ class App extends React.Component {
       data: [],
       filteredData: [],
       showModal: false,
+      modalLoading: false,
       activeOrder: 0,
       activeUser: "",
       year: moment(),
@@ -81,7 +82,8 @@ class App extends React.Component {
       reverse: true,
       userTotals: [],
       customerIDs: [],
-      filterFields: {}
+      filterFields: {},
+      currentOrderData: {}
     };
   }
 
@@ -233,11 +235,16 @@ class App extends React.Component {
   };
 
   asyncGetOrderDetails = order_id => {
+    this.setState({
+      showModal: true,
+      modalLoading: true
+    });
     fetch(`/api/orders/${currentId}/${order_id}`)
       .then(res => res.json())
       .then(json => {
         this.setState({
-          currentOrderData: json
+          currentOrderData: json,
+          modalLoading: false
         });
       })
       .catch(err => {
@@ -258,10 +265,11 @@ class App extends React.Component {
         !shouldFetchUpdates &&
         localStorage.getItem(`${currentId}:sessionData`)
       ) {
-        return this.setState({
+        this.setState({
           ...JSON.parse(localStorage.getItem(`${currentId}:sessionData`)),
           loading: false
         });
+        return this.handleYear(this.state.year.format("YYYY"));
       }
       fetch(`/api/orders/${currentId}`)
         .then(res => res.json())
@@ -285,6 +293,7 @@ class App extends React.Component {
               this.setState({
                 loading: false
               });
+              this.handleYear(this.state.year);
             })
             .catch(err => console.error(err));
         })
@@ -305,17 +314,18 @@ class App extends React.Component {
           filterFields,
           filterBy,
           showModal,
+          modalLoading,
           approve,
           logo,
           orders,
           year,
-          customers
+          customers,
+          currentOrderData
         } = this.state;
-        console.log(this.state);
         let orderData, userOrderData;
         let companyName =
           filterBy !== "all"
-            ? companyName +
+            ? this.state.companyName +
               " — " +
               getFilterFieldName(filter) +
               " " +
@@ -515,30 +525,20 @@ class App extends React.Component {
           );
         });
         //get data for current order
-        if (this.state.activeOrder !== 0) {
-          orderData = data
-            .filter(item => {
-              let num = this.state.activeOrder;
-              return item.order_id === num;
-            })
-            .map(item => item.products);
-          orderData = orderData[0]
-            ? _.map(orderData[0], (item, index) => {
-                //strip html and options from item description
-                let description = item.product.split("<", 1)[0];
-                return (
-                  <TableRow key={index}>
-                    <TableCell>{item.product_code}</TableCell>
-                    <TableCell>{description}</TableCell>
-                    <TableCell>${(+item.price).toFixed(2)}</TableCell>
-                    <TableCell>{item.amount}</TableCell>
-                    <TableCell>
-                      ${+(item.price * item.amount).toFixed(2)}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            : orderData;
+        if (currentOrderData) {
+          orderData = _.map(currentOrderData.products || {}, (item, index) => {
+            //strip html and options from item description
+            let description = item.product.split("<", 1)[0];
+            return (
+              <TableRow key={index}>
+                <TableCell>{item.product_code}</TableCell>
+                <TableCell>{description}</TableCell>
+                <TableCell>${(+item.price).toFixed(2)}</TableCell>
+                <TableCell>{item.amount}</TableCell>
+                <TableCell>${+(item.price * item.amount).toFixed(2)}</TableCell>
+              </TableRow>
+            );
+          });
         }
 
         //get data for current customer
@@ -573,11 +573,10 @@ class App extends React.Component {
           userTotals.filter(item => item.name === this.state.activeUser)
         );
         const approveOrderData = data.filter(o => o.status === "O");
-        modalData = this.state.activeOrder !== 0 ? orderData : userOrderData;
-        modalTitle =
-          this.state.activeOrder !== 0
-            ? "Order #" + this.state.activeOrder
-            : "Shopper Profile for " + this.state.activeUser;
+        modalData = currentOrderData ? orderData : userOrderData;
+        modalTitle = currentOrderData
+          ? "Order #" + currentOrderData.order_id
+          : "Shopper Profile for " + this.state.activeUser;
 
         return (
           <Router>
@@ -607,6 +606,7 @@ class App extends React.Component {
                       modalData={modalData}
                       userDetails={userDetails}
                       showModal={showModal}
+                      modalLoading={modalLoading}
                       setShowModal={this.setShowModal}
                       setActiveOrder={this.setActiveOrder}
                       filter={getFilterFieldName(filter)}
@@ -625,13 +625,15 @@ class App extends React.Component {
       } else {
         return (
           <Grommet theme={theme}>
-            <Loading
-              className="loading"
-              type="cylon"
-              color="#222"
-              width="20vw"
-            />
-            <h1>Loading, please wait...</h1>
+            <Box>
+              <Loading
+                className="loading"
+                type="cylon"
+                color="#222"
+                width="20vw"
+              />
+              <h1>Loading, please wait...</h1>
+            </Box>
           </Grommet>
         );
       }

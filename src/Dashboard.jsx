@@ -18,21 +18,21 @@ const DashboardContainer = styled(Box)`
 
 const PaddedSelectContainer = styled.div`
   padding-left: 20px;
-`
+`;
 
 const ResponsiveBox = styled(Box)`
   @media (max-width: 732px) {
     flex-flow: wrap;
   }
-`
+`;
 
 const PaddedBox = styled(Box)`
   padding: 20px;
-  `
+`;
 
 const StyledSelect = styled(Select)`
   max-width: 300px;
-  `
+`;
 
 export const Dashboard = ({
   logo,
@@ -48,6 +48,7 @@ export const Dashboard = ({
   tooltipContent,
   headers,
   tableData,
+  modalLoading,
   modalTitle,
   modalData,
   userDetails,
@@ -64,8 +65,8 @@ export const Dashboard = ({
   setActiveOrder,
   logout
 }) => {
-  const [showOrders, setShowOrders] = useState('all');
-  const formattedYear = year === 'all' ? year : moment(year).format("YYYY");
+  const [showOrders, setShowOrders] = useState("all");
+  const formattedYear = year === "all" ? year : moment(year).format("YYYY");
   const yearSelect = (
     <StyledSelect
       value={formattedYear}
@@ -84,8 +85,8 @@ export const Dashboard = ({
       <DashboardContainer>
         <div>
           <PaddedSelectContainer>
-          <p>Filter by Year:</p>
-          {yearSelect}
+            <p>Filter by Year:</p>
+            {yearSelect}
           </PaddedSelectContainer>
           <Tabs id="qm-tabs" style={{ marginTop: "20px" }}>
             <Tab title="Summary">
@@ -112,7 +113,6 @@ export const Dashboard = ({
                       handleFilter={handleFilter}
                     />
                   )}
-                  
                 </div>
               )}
             </Tab>
@@ -121,14 +121,18 @@ export const Dashboard = ({
                 <p>View by:</p>
                 <StyledSelect
                   value={showOrders}
-                  onChange={({option}) => setShowOrders(option)}
-                  options={['all', 'employee']}
+                  onChange={({ option }) => setShowOrders(option)}
+                  options={["all", "employee"]}
                   placeholder="select"
                 />
               </PaddedSelectContainer>
               <PaddedBox>
-                {showOrders === 'employee' && <Table headers={userHeaders} tableData={userSpendData} />}
-                {showOrders === 'all' && <Table headers={headers} tableData={tableData} />}
+                {showOrders === "employee" && (
+                  <Table headers={userHeaders} tableData={userSpendData} />
+                )}
+                {showOrders === "all" && (
+                  <Table headers={headers} tableData={tableData} />
+                )}
               </PaddedBox>
               <DetailModal
                 modalTitle={modalTitle}
@@ -136,6 +140,7 @@ export const Dashboard = ({
                 userDetails={userDetails}
                 showModal={showModal}
                 setShowModal={setShowModal}
+                modalLoading={modalLoading}
               />
             </Tab>
             {approve && (
@@ -148,6 +153,7 @@ export const Dashboard = ({
                   userDetails={userDetails}
                   setShowModal={setShowModal}
                   showModal={showModal}
+                  modalLoading={modalLoading}
                   setActiveOrder={setActiveOrder}
                 />
               </Tab>
