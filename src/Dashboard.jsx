@@ -4,7 +4,6 @@ import { Table } from "./components/Table";
 import { UserSpendChart } from "./UserSpendChart";
 import { Logo } from "./Logo";
 import { DetailModal } from "./DetailModal";
-import { DataBlock } from "./components/DataBlock";
 import { FilterDropdown } from "./components/FilterDropdown";
 import ApproveDeny from "./ApproveDeny";
 import { Header, Grid, Button, Tabs, Tab, Box, Select } from "grommet";
