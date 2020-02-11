@@ -62,6 +62,12 @@ export function getStoreID (username) {
     case 'allinaems':
       return 13;
       break;
+    case 'northsecurity': 
+      return 28;
+      break;
+    case 'workhouse': 
+      return 29;
+      break;
     default:
       return 0;
   }
@@ -207,6 +213,18 @@ export function getCompanyInfo(id) {
           companyName: 'Inver Grove Heights Police Department',
           logo: 'ighpd.jpg',
           approve: true,
+          maxSpend: 0
+        }
+      case 28:
+        return {
+          companyName: 'North Memorial Security',
+          logo: 'northmemorial.png',
+          maxSpend: 0
+        }
+      case 29:
+        return {
+          companyName: 'Anoka County Corrections Workhouse',
+          logo: 'anokaworkhouse.jpg',
           maxSpend: 0
         }
     default:
