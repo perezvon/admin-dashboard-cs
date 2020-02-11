@@ -1,34 +1,95 @@
-import React from 'react';
-import Modal from 'react-bootstrap/lib/Modal';
-import Button from 'react-bootstrap/lib/Button';
-import {UserDetails} from './UserDetails';
+import React from "react";
+import { UserDetails } from "./UserDetails";
+import LoadingSpinner from "./components/LoadingSpinner";
+import {
+  Button,
+  Layer,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  Box
+} from "grommet";
+import styled from "styled-components";
 
-export const DetailModal = ({modalTitle, modalData, showModal, openModal, closeModal, userDetails}) => (
-  <Modal show={showModal} onHide={closeModal} bsSize='large' aria-labelledby='contained-modal-title-lg'>
-          <Modal.Header closeButton>
-            <Modal.Title id='contained-modal-title-lg' className='h2'>{modalTitle}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {userDetails &&
-            <UserDetails userDetails={userDetails} />
-            }
-            <table className='table table-responsive table-bordered table-striped'>
-              <thead className='thead-default'>
-                <tr>
-                  <th>Product Number</th>
-                  <th>Product Name</th>
-                  <th>Price</th>
-                  <th>QTY</th>
-                  <th>Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {modalData}
-              </tbody>
-            </table>
-          </Modal.Body>
-       <Modal.Footer>
-         <Button onClick={closeModal}>Close</Button>
-       </Modal.Footer>
-     </Modal>
-)
+const StyledLayer = styled(Layer)`
+  padding: 20px 30px 30px 30px;
+  min-width: 300px;
+  min-height: 400px;
+  overflow: auto;
+
+  @media (min-width: 650px) {
+    width: 600px;
+  }
+`;
+
+const CenteredBox = styled(Box)`
+  justify-content: center;
+  align-items: center;
+`;
+
+const CloseButton = styled(Button)`
+  background: #f25454;
+  color: white;
+  border-radius: 100px;
+  padding: 8px 15px;
+  transition: background 0.3s;
+  &:hover {
+    background: #bc3232;
+  }
+`;
+
+const Footer = styled.footer`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export const DetailModal = ({
+  modalLoading,
+  modalTitle,
+  modalData,
+  showModal,
+  setShowModal,
+  userDetails
+}) =>
+  showModal && (
+    <StyledLayer
+      onEsc={() => setShowModal(false)}
+      onClickOutside={() => setShowModal(false)}
+    >
+      {modalLoading && (
+        <CenteredBox>
+          <h2>Loading...</h2>
+          <LoadingSpinner size="xlarge" />
+        </CenteredBox>
+      )}
+      {!modalLoading && (
+        <div>
+          <header>
+            <h2>{modalTitle}</h2>
+          </header>
+          <main>
+            {userDetails && <UserDetails userDetails={userDetails} />}
+            {modalData && modalData.length > 0 && (
+              <Table>
+                <TableHeader className="thead-default">
+                  <TableRow>
+                    <TableCell>Product Number</TableCell>
+                    <TableCell>Product Name</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell>QTY</TableCell>
+                    <TableCell>Subtotal</TableCell>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>{modalData}</TableBody>
+              </Table>
+            )}
+          </main>
+          <Footer>
+            <CloseButton onClick={() => setShowModal(false)}>Close</CloseButton>
+          </Footer>
+        </div>
+      )}
+    </StyledLayer>
+  );

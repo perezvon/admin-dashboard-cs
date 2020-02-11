@@ -1,13 +1,41 @@
-import React from 'react';
-import moment from 'moment';
-import {Button, Grid, Row, Col, Tabs, Tab, FormGroup, ControlLabel, FormControl } from 'react-bootstrap'
-import './Dashboard.css';
-import {Table} from './Table'
-import {UserSpendChart} from './UserSpendChart'
-import {Logo} from './Logo'
-import {DetailModal} from './DetailModal'
-import {FilterDropdown} from './FilterDropdown'
-import ApproveDeny from './ApproveDeny'
+import React, { useState } from "react";
+import moment from "moment";
+import { Table } from "./components/Table";
+import { UserSpendChart } from "./UserSpendChart";
+import { Logo } from "./Logo";
+import { DetailModal } from "./DetailModal";
+import { FilterDropdown } from "./components/FilterDropdown";
+import ApproveDeny from "./ApproveDeny";
+import { Header, Grid, Button, Tabs, Tab, Box, Select } from "grommet";
+import { Logout } from "grommet-icons";
+import styled from "styled-components";
+
+const StyledHeader = styled(Header)`
+  padding: 0 20px;
+`;
+
+const DashboardContainer = styled(Box)`
+  background: #f2f2f2;
+  min-height: 100vh;
+`;
+
+const PaddedSelectContainer = styled.div`
+  padding-left: 20px;
+`;
+
+const ResponsiveBox = styled(Box)`
+  @media (max-width: 732px) {
+    flex-flow: wrap;
+  }
+`;
+
+const PaddedBox = styled(Box)`
+  padding: 20px;
+`;
+
+const StyledSelect = styled(Select)`
+  max-width: 300px;
+`;
 
 export const Dashboard = ({
   logo,
@@ -18,17 +46,17 @@ export const Dashboard = ({
   userHeaders,
   userSpendData,
   totalOrders,
-  productsPurchased,
+  averageOrderTotal,
   chartData,
   tooltipContent,
   headers,
   tableData,
+  modalLoading,
   modalTitle,
   modalData,
   userDetails,
   showModal,
-  openModal,
-  closeModal,
+  setShowModal,
   filter,
   approve,
   orderData,
@@ -38,120 +66,105 @@ export const Dashboard = ({
   handleYear,
   approveOrDenyOrders,
   setActiveOrder,
-  logout}) => {
-const formattedYear = moment.isMoment(year) ? moment(year).format('YYYY') : year;
-const yearSelect = <FormGroup controlId="formControlsSelect">
-  <ControlLabel>Filter by Year:</ControlLabel>
-  <FormControl style={{width: '200px'}} value={formattedYear} onChange={e => handleYear(e.target.value)} componentClass="select" placeholder="select">
-    <option value='all'>all</option>
-    <option value={'2020'}>2020</option>
-    <option value={'2019'}>2019</option>
-    <option value={'2018'}>2018</option>
-  </FormControl>
-  </FormGroup>
-if (approve) {
-  const activeKey = orderData.length > 0 ? 2 : 1
-  
+  logout
+}) => {
+  const [showOrders, setShowOrders] = useState("all");
+  const formattedYear = year === "all" ? year : moment(year).format("YYYY");
+  const yearSelect = (
+    <StyledSelect
+      value={formattedYear}
+      onChange={({ option }) => handleYear(option)}
+      options={["all", 2020, 2019, 2018]}
+      placeholder="select"
+    />
+  );
+  // const activeKey = orderData.length > 0 ? 2 : 1;
   return (
     <Grid>
-      <Row>
-       <Col md={10}>
-         <h1>{logo ? <Logo logo={logo}/> : {companyName}}</h1>
-      </Col>
-        <Col md={2}>
-        <Button bsStyle='warning' onClick={logout}>Logout</Button>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12}>
+      <StyledHeader>
+        <h1>{logo ? <Logo logo={logo} height="65px" /> : { companyName }}</h1>
+        <Box direction="row">
+          <p>Filter by Year:</p>
           {yearSelect}
-          <Tabs defaultActiveKey={activeKey} id="qm-tabs" style={{marginTop: '20px'}}>
-            <Tab eventKey={1} title="Orders Summary">
-              {userData &&
+          {filter && dropdownItems.length > 0 && <p>{filter}</p>}
+          {filter && dropdownItems.length > 0 && (
+            <FilterDropdown
+              filter={filter}
+              dropdownItems={dropdownItems}
+              handleFilter={handleFilter}
+            />
+          )}
+        </Box>
+        <Button icon={<Logout />} onClick={logout} />
+      </StyledHeader>
+      <DashboardContainer>
+        <div>
+          <Tabs id="qm-tabs" style={{ marginTop: "20px" }}>
+            <Tab title="Summary">
+              {userData && (
                 <div>
-                <div className='row'>
-                  <div className='col-md-6'>
-                    {totalSpend}
-                    {spendRemaining}
-                    {totalOrders}
-                    {productsPurchased}
-                    </div>
-                  <div className='col-md-6'>
-                    <UserSpendChart chartData={chartData} tooltipContent={tooltipContent} />
-                  </div>
+                  <Box>
+                    <ResponsiveBox direction="row" align="center">
+                      <Box direction="row" wrap={true} justify="center">
+                        {totalSpend}
+                        {spendRemaining}
+                        {totalOrders}
+                        {averageOrderTotal}
+                      </Box>
+                      <UserSpendChart
+                        chartData={chartData}
+                        tooltipContent={tooltipContent}
+                      />
+                    </ResponsiveBox>
+                  </Box>
                 </div>
-                { filter &&
-                  <FilterDropdown filter={filter} dropdownItems={dropdownItems} handleFilter={handleFilter}/>
-                }
-                <div className='col-md-6'>
-                <Table headers={userHeaders} tableData={userSpendData} />
-                </div>
-               <Table headers={headers} tableData={tableData} />
-               <DetailModal
-                 modalTitle={modalTitle}
-                 modalData={modalData}
-                 userDetails={userDetails}
-                 showModal={showModal}
-                 openModal={openModal}
-                 closeModal={closeModal} />
-                </div>
-               }
+              )}
             </Tab>
-            <Tab eventKey={2} title="Approve/Deny Orders">
-              <ApproveDeny
-                data={orderData}
-                approveOrDenyOrders={approveOrDenyOrders}
+            <Tab title="Orders">
+              <PaddedSelectContainer>
+                <p>View by:</p>
+                <StyledSelect
+                  value={showOrders}
+                  onChange={({ option }) => setShowOrders(option)}
+                  options={["all", "employee"]}
+                  placeholder="select"
+                />
+              </PaddedSelectContainer>
+              <PaddedBox>
+                {showOrders === "employee" && (
+                  <Table headers={userHeaders} tableData={userSpendData} />
+                )}
+                {showOrders === "all" && (
+                  <Table headers={headers} tableData={tableData} />
+                )}
+              </PaddedBox>
+              <DetailModal
                 modalTitle={modalTitle}
                 modalData={modalData}
                 userDetails={userDetails}
-                openModal={openModal}
-                closeModal={closeModal}
                 showModal={showModal}
-                setActiveOrder={setActiveOrder}
-                />
+                setShowModal={setShowModal}
+                modalLoading={modalLoading}
+              />
             </Tab>
+            {approve && (
+              <Tab title="Approve/Deny Orders">
+                <ApproveDeny
+                  data={orderData}
+                  approveOrDenyOrders={approveOrDenyOrders}
+                  modalTitle={modalTitle}
+                  modalData={modalData}
+                  userDetails={userDetails}
+                  setShowModal={setShowModal}
+                  showModal={showModal}
+                  modalLoading={modalLoading}
+                  setActiveOrder={setActiveOrder}
+                />
+              </Tab>
+            )}
           </Tabs>
-        </Col>
-      </Row>
+        </div>
+      </DashboardContainer>
     </Grid>
-  )
-}
-else {
-  return (
-      <Grid>
-          <Row>
-           <Col md={10}>
-          <h1>{logo ? <Logo logo={logo}/> : {companyName}}</h1>
-          </Col>
-            <Col md={2}>
-              <Button bsStyle='warning' onClick={logout}>Logout</Button>
-            </Col>
-          </Row>
-          {userData &&
-            <div>
-            <Row>
-              <Col md={6}>
-                {yearSelect}
-                {totalSpend}
-                {spendRemaining}
-                {totalOrders}
-                {productsPurchased}
-              </Col>
-              <Col md={6}>
-                <UserSpendChart chartData={chartData} tooltipContent={tooltipContent} />
-              </Col>
-            </Row>
-            { filter &&
-              <FilterDropdown filter={filter} dropdownItems={dropdownItems} handleFilter={handleFilter}/>
-            }
-            <Col md={6}>
-            <Table headers={userHeaders} tableData={userSpendData} />
-            </Col>
-           <Table headers={headers} tableData={tableData} />
-           <DetailModal modalTitle={modalTitle} modalData={modalData} userDetails={userDetails} showModal={showModal} openModal={openModal} closeModal={closeModal} />
-            </div>
-           }
-      </Grid>
-    )
-  }
-}
+  );
+};
