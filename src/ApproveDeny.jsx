@@ -54,20 +54,20 @@ export default class ApproveDeny extends React.Component {
       modalData,
       userDetails,
       showModal,
-      openModal,
-      closeModal,
+      setShowModal,
+      modalLoading,
       setActiveOrder
     } = this.state;
     const headers = ["Order", "Name", "Total", "Approved?", "Notes"].map(i => (
       <td>{i}</td>
     ));
     const tableData = data.map((i, index) => (
-      <TableRow key={i.order_id} data-order={i.order_id}>
-        <TableCell onClick={setActiveOrder}>{i.order_id}</TableCell>
-        <TableCell onClick={setActiveOrder}>
+      <TableRow key={i.order_id}>
+        <TableCell onClick={setActiveOrder} data-order={i.order_id}>{i.order_id}</TableCell>
+        <TableCell onClick={setActiveOrder} data-order={i.order_id}>
           {i.b_firstname ? i.b_firstname + " " + i.b_lastname : i.email}
         </TableCell>
-        <TableCell onClick={setActiveOrder}>{`$${i.total}`}</TableCell>
+        <TableCell onClick={setActiveOrder} data-order={i.order_id}>{`$${i.total}`}</TableCell>
         <TableCell>
           <label className="switch">
             <input
@@ -97,8 +97,8 @@ export default class ApproveDeny extends React.Component {
             modalData={modalData}
             userDetails={userDetails}
             showModal={showModal}
-            openModal={openModal}
-            closeModal={closeModal}
+            modalLoading={modalLoading}
+            setShowModal={setShowModal}
           />
         </div>
       );

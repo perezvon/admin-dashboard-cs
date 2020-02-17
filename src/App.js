@@ -95,7 +95,7 @@ class App extends React.Component {
 
   setActiveOrder = e => {
     e.preventDefault();
-    const order = e.target.parentNode.attributes.getNamedItem("data-order")
+    const order = e.target.attributes.getNamedItem("data-order")
       .value;
     this.asyncGetOrderDetails(order);
     this.setState({
