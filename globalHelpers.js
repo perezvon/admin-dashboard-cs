@@ -124,7 +124,6 @@ function approvalNeeded(company_id, orderInfo) {
 }
 
 function updateOrderStatus(order_id, status, callback) {
-  console.log(status)
   const http = require("http");
   const request = require("request")
   const base64key = Buffer.from(process.env.REACT_APP_API_USER + ':' + process.env.REACT_APP_API_KEY, 'utf8').toString('base64')

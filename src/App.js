@@ -1,21 +1,21 @@
-import React from "react";
-import "./App.css";
-import { Dashboard } from "./Dashboard";
-import Loading from "react-loading";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import _ from "underscore";
-import Auth0Lock from "auth0-lock";
+import React from 'react';
+import './App.css';
+import { Dashboard } from './Dashboard';
+import Loading from 'react-loading';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import _ from 'underscore';
+import Auth0Lock from 'auth0-lock';
 import {
   sortCollection,
   getCompanyInfo,
   getStoreID,
-  getFilterFieldName
-} from "./global";
-import moment from "moment";
-import { Grommet, Box, TableRow, TableCell } from "grommet";
-import DataBlock from "./components/DataBlock";
-import LoadingSpinner from "./components/LoadingSpinner";
-import styled from "styled-components";
+  getFilterFieldName,
+} from './global';
+import moment from 'moment';
+import { Grommet, Box, TableRow, TableCell } from 'grommet';
+import DataBlock from './components/DataBlock';
+import LoadingSpinner from './components/LoadingSpinner';
+import styled from 'styled-components';
 
 const ClickableTableRow = styled(TableRow)`
   cursor: pointer;
@@ -33,43 +33,14 @@ const LoadingContainer = styled(Box)`
 const theme = {
   global: {
     font: {
-      family: "Roboto",
-      size: "16px",
-      height: "20px"
-    }
-  }
+      family: 'Roboto',
+      size: '16px',
+      height: '20px',
+    },
+  },
 };
 
-const fromUrl = window.location.href || "https://qm-dashboard.herokuapp.com";
-
-const lock = new Auth0Lock(
-  process.env.REACT_APP_AUTH0_KEY,
-  "perezvon.auth0.com",
-  {
-    allowedConnections: ["Username-Password-Authentication"],
-    languageDictionary: {
-      usernameOrEmailInputPlaceholder: "username",
-      title: "Quartermaster Dashboard"
-    }
-  }
-);
-
-lock.on("authenticated", function(authResult) {
-  // Use the token in authResult to getUserInfo() and save it to localStorage
-  lock.getUserInfo(authResult.accessToken, (error, profile) => {
-    if (error) {
-      console.log(error);
-      return;
-    }
-    localStorage.setItem("accessToken", authResult.accessToken);
-    localStorage.setItem("username", profile.username);
-    localStorage.setItem("profile", profile.app_metadata);
-  });
-});
-
-const token = localStorage.getItem("accessToken");
-const username = localStorage.getItem("username");
-const currentId = getStoreID(username);
+const fromUrl = window.location.href || 'https://qm-dashboard.herokuapp.com';
 
 class App extends React.Component {
   constructor(props) {
@@ -81,35 +52,48 @@ class App extends React.Component {
       showModal: false,
       modalLoading: false,
       activeOrder: 0,
-      activeUser: "",
+      activeUser: '',
       year: moment(),
-      filter: "",
-      filterBy: "all",
-      sort: "orderNumber",
+      filter: '',
+      filterBy: 'all',
+      sort: 'orderNumber',
       reverse: true,
       userTotals: [],
       filterFields: {},
-      currentOrderData: {}
+      currentOrderData: {},
+      lock: new Auth0Lock(
+        process.env.REACT_APP_AUTH0_KEY,
+        'perezvon.auth0.com',
+        {
+          allowedConnections: ['Username-Password-Authentication'],
+          languageDictionary: {
+            usernameOrEmailInputPlaceholder: 'username',
+            title: 'Quartermaster Dashboard',
+          },
+        }
+      ),
+      token: localStorage.getItem('accessToken'),
+      username: localStorage.getItem('username'),
+      currentId: getStoreID(localStorage.getItem('username'))
     };
   }
 
   setActiveOrder = e => {
     e.preventDefault();
-    const order = e.target.attributes.getNamedItem("data-order")
-      .value;
+    const order = e.target.attributes.getNamedItem('data-order') ? e.target.attributes.getNamedItem('data-order').value : e.target.parentNode.attributes.getNamedItem('data-order').value;
     this.asyncGetOrderDetails(order);
     this.setState({
-      activeUser: 0
+      activeUser: 0,
     });
   };
 
   setActiveUser = e => {
     e.preventDefault();
-    const user = e.target.parentNode.attributes.getNamedItem("data-user").value;
+    const user = e.target.parentNode.attributes.getNamedItem('data-user').value;
     this.setState({
       activeUser: user,
       currentOrderData: {},
-      showModal: true
+      showModal: true,
     });
   };
 
@@ -124,120 +108,120 @@ class App extends React.Component {
 
   sortFactor = e => {
     e.preventDefault();
-    const sort = e.target.attributes.getNamedItem("data-sort").value;
+    const sort = e.target.attributes.getNamedItem('data-sort').value;
     let reverseValue = this.state.reverse;
     switch (sort) {
-      case "Order Number":
+      case 'Order Number':
         this.setState({
           lastSort: this.state.sort,
-          sort: "orderNumber",
-          reverse: !reverseValue
+          sort: 'orderNumber',
+          reverse: !reverseValue,
         });
         break;
-      case "Order Date":
+      case 'Order Date':
         this.setState({
           lastSort: this.state.sort,
-          sort: "date",
-          reverse: !reverseValue
+          sort: 'date',
+          reverse: !reverseValue,
         });
         break;
-      case "Employee":
+      case 'Employee':
         this.setState({
           lastSort: this.state.sort,
-          sort: "name",
-          reverse: !reverseValue
+          sort: 'name',
+          reverse: !reverseValue,
         });
         break;
-      case "Subtotal":
+      case 'Subtotal':
         this.setState({
           lastSort: this.state.sort,
-          sort: "subtotal",
-          reverse: !reverseValue
+          sort: 'subtotal',
+          reverse: !reverseValue,
         });
         break;
-      case "Tax":
+      case 'Tax':
         this.setState({
           lastSort: this.state.sort,
-          sort: "tax",
-          reverse: !reverseValue
+          sort: 'tax',
+          reverse: !reverseValue,
         });
         break;
-      case "Total":
+      case 'Total':
         this.setState({
           lastSort: this.state.sort,
-          sort: "total",
-          reverse: !reverseValue
+          sort: 'total',
+          reverse: !reverseValue,
         });
         break;
-      case "Shipping":
+      case 'Shipping':
         this.setState({
           lastSort: this.state.sort,
-          sort: "shipping",
-          reverse: !reverseValue
+          sort: 'shipping',
+          reverse: !reverseValue,
         });
         break;
       default:
         this.setState({
           lastSort: this.state.sort,
-          sort: ""
+          sort: '',
         });
     }
   };
 
   logout = () => {
     localStorage.clear();
-    lock.logout({
-      returnTo: fromUrl
+    this.state.lock.logout({
+      returnTo: fromUrl,
     });
   };
 
   handleFilter = eventKey => {
-    if (eventKey !== "all") {
+    if (eventKey !== 'all') {
       this.setState(prevState => {
         return {
           filterBy: eventKey,
           filteredData: prevState.orders.filter(
             i => i.fields[prevState.filter] === eventKey
-          )
+          ),
         };
       });
     } else
       this.setState({
         filterBy: eventKey,
-        filteredData: this.state.orders
+        filteredData: this.state.orders,
       });
   };
 
   handleYear = year => {
-    if (year !== "all") {
+    if (year !== 'all') {
       const formattedYear = moment(`01/01/${year}`);
       this.setState(prevState => ({
         year: formattedYear,
         filteredData: prevState.orders.filter(d =>
-          moment.unix(+d.timestamp).isSame(formattedYear, "year")
-        )
+          moment.unix(+d.timestamp).isSame(formattedYear, 'year')
+        ),
       }));
     } else
       this.setState({
-        year: "all",
-        filteredData: this.state.orders
+        year: 'all',
+        filteredData: this.state.orders,
       });
   };
 
   approveOrDenyOrders = data => {
-    fetch("/api/approve-deny", {
+    fetch('/api/approve-deny', {
       body: JSON.stringify(data),
-      cache: "no-cache",
-      credentials: "include",
+      cache: 'no-cache',
+      credentials: 'include',
       headers: {
-        "content-type": "application/json"
+        'content-type': 'application/json',
       },
-      method: "POST",
-      mode: "same-origin"
+      method: 'POST',
+      mode: 'same-origin',
     })
       .then(res => res.json())
       .then(json => {
-        alert("Order Statuses Updated!");
+        alert('Order Statuses Updated!');
       })
       .catch(err => console.error(err));
   };
@@ -245,14 +229,14 @@ class App extends React.Component {
   asyncGetOrderDetails = order_id => {
     this.setState({
       showModal: true,
-      modalLoading: true
+      modalLoading: true,
     });
-    fetch(`/api/orders/${currentId}/${order_id}`)
+    fetch(`/api/orders/${this.state.currentId}/${order_id}`)
       .then(res => res.json())
       .then(json => {
         this.setState({
           currentOrderData: json,
-          modalLoading: false
+          modalLoading: false,
         });
       })
       .catch(err => {
@@ -261,11 +245,27 @@ class App extends React.Component {
   };
 
   componentDidMount = () => {
+    const { lock, token, currentId } = this.state;
+    
+    lock.on('authenticated', (authResult) => {
+      // Use the token in authResult to getUserInfo() and save it to localStorage
+      lock.getUserInfo(authResult.accessToken, (error, profile) => {
+        if (error) {
+          console.log(error);
+          return;
+        }
+        this.setState({ token: authResult.accessToken });
+        localStorage.setItem('accessToken', authResult.accessToken);
+        localStorage.setItem('username', profile.username);
+        localStorage.setItem('profile', profile.app_metadata);
+      });
+    });
+    
     if (token) {
       let shouldFetchUpdates = false;
       if (
-        !localStorage.getItem("lastUpdate") ||
-        moment() - moment(localStorage.getItem("lastUpdate")) > 3600000
+        !localStorage.getItem('lastUpdate') ||
+        moment() - moment(localStorage.getItem('lastUpdate')) > 3600000
       ) {
         shouldFetchUpdates = true;
       }
@@ -275,9 +275,9 @@ class App extends React.Component {
       ) {
         this.setState({
           ...JSON.parse(localStorage.getItem(`${currentId}:sessionData`)),
-          loading: false
+          loading: false,
         });
-        return this.handleYear(this.state.year.format("YYYY"));
+        return this.handleYear(this.state.year.format('YYYY'));
       }
       fetch(`/api/orders/${currentId}`)
         .then(res => res.json())
@@ -286,24 +286,25 @@ class App extends React.Component {
           this.setState({
             orders: orderData,
             ...getCompanyInfo(currentId),
-            loading: false
+            loading: false,
           });
-          localStorage.setItem("lastUpdate", moment());
+          localStorage.setItem('lastUpdate', moment());
           localStorage.setItem(
             `${currentId}:sessionData`,
             JSON.stringify(this.state)
           );
-          this.handleYear(this.state.year.format("YYYY"));
+          this.handleYear(this.state.year.format('YYYY'));
         })
         .catch(err => {
           console.error(err);
           this.setState({ apiError: true });
         });
     }
+    
   };
 
   render() {
-    if (token) {
+    if (this.state.token) {
       if (!this.state.loading) {
         const {
           data,
@@ -318,26 +319,26 @@ class App extends React.Component {
           logo,
           orders,
           year,
-          currentOrderData
+          currentOrderData,
         } = this.state;
         let orderData, userOrderData;
         let companyName =
-          filterBy !== "all"
+          filterBy !== 'all'
             ? this.state.companyName +
-              " — " +
+              ' — ' +
               getFilterFieldName(filter) +
-              " " +
-              filterFields[filterBy].split(" ")[0]
+              ' ' +
+              filterFields[filterBy].split(' ')[0]
             : companyName;
         let chartData = [];
         let tooltipContent;
         let companyTotal = 0;
-        let totalSpend = "";
-        let userData = "";
+        let totalSpend = '';
+        let userData = '';
         let userHeaders, userSpendData;
-        let totalOrders = "";
+        let totalOrders = '';
         let totalProductCount = 0;
-        let averageOrderTotal = "";
+        let averageOrderTotal = '';
         let orderTotals = [];
         let tableData;
         let headers = [];
@@ -347,10 +348,10 @@ class App extends React.Component {
         let userTotals = [];
         let dropdownItems;
         const selectedYear =
-          year === "all" ? year : moment(year).format("YYYY");
+          year === 'all' ? year : moment(year).format('YYYY');
         let approvedOrders = this.state.approve
-          ? filteredData.filter(i => i.status === "P")
-          : filteredData.filter(i => i.status !== "I");
+          ? filteredData.filter(i => i.status === 'P')
+          : filteredData.filter(i => i.status !== 'I');
         //populate orders array
         approvedOrders.forEach(order => {
           let {
@@ -360,10 +361,10 @@ class App extends React.Component {
             firstname,
             lastname,
             email,
-            total
+            total,
           } = order;
           let orderNumber = order_id;
-          let date = moment.unix(timestamp).format("MMMM DD, YYYY");
+          let date = moment.unix(timestamp).format('MMMM DD, YYYY');
           let name = firstname ? `${firstname} ${lastname}` : email;
           total = +total;
           orderTotals.push({
@@ -371,7 +372,7 @@ class App extends React.Component {
             orderNumber,
             date,
             name,
-            total
+            total,
           });
         });
         //filter menu dropdown items
@@ -381,7 +382,7 @@ class App extends React.Component {
               .map(item => item.fields[this.state.filter])
               .filter(item => !!item)
               .sort((a, b) => +a - +b)
-          )
+          ),
         ];
         dropdownItems = dropdownItems.map(
           (item, index) => this.state.filterFields[item] || item
@@ -389,7 +390,7 @@ class App extends React.Component {
 
         //get unique users && create dataset for each
         const uniqueUsers = [
-          ...new Set(approvedOrders.map(item => item.user_id))
+          ...new Set(approvedOrders.map(item => item.user_id)),
         ];
         totalSpendRemaining = 0;
 
@@ -427,7 +428,7 @@ class App extends React.Component {
             name: userName,
             orders: numOfOrders,
             total: +currentTotal,
-            spendRemaining: userSpendRemaining
+            spendRemaining: userSpendRemaining,
           });
         });
         let sortedOrders = sortCollection(
@@ -436,7 +437,7 @@ class App extends React.Component {
           this.state.reverse
         );
         //format orders for order table
-        headers = ["Order Number", "Order Date", "Employee", "Total"].map(
+        headers = ['Order Number', 'Order Date', 'Employee', 'Total'].map(
           (item, index) => (
             <TableCell key={index} data-sort={item} onClick={this.sortFactor}>
               {item}
@@ -453,18 +454,18 @@ class App extends React.Component {
               {_.map(
                 item,
                 (i, key) =>
-                  key !== "user_id" && <TableCell key={key}>{i}</TableCell>
+                  key !== 'user_id' && <TableCell key={key}>{i}</TableCell>
               )}
             </ClickableTableRow>
           );
         });
         //format users for user spend table
-        userHeaders = ["Employee"].map((item, index) => (
+        userHeaders = ['Employee'].map((item, index) => (
           <TableCell key={index} data-sort={item} onClick={this.sortFactor}>
             {item}
           </TableCell>
         ));
-        userSpendData = _.uniq(orderTotals, "user_id").map((item, index) => {
+        userSpendData = _.uniq(orderTotals, 'user_id').map((item, index) => {
           return (
             <ClickableTableRow
               key={item.user_id}
@@ -472,7 +473,7 @@ class App extends React.Component {
               onClick={this.setActiveUser}
             >
               {_.map(item, (i, key) => {
-                return key === "name" ? (
+                return key === 'name' ? (
                   <TableCell key={i}>{i}</TableCell>
                 ) : null;
               })}
@@ -482,7 +483,7 @@ class App extends React.Component {
 
         //number of orders
         totalOrders = (
-          <DataBlock label={"Number of Orders"} value={approvedOrders.length} />
+          <DataBlock label={'Number of Orders'} value={approvedOrders.length} />
         );
 
         //total products purchased
@@ -493,19 +494,19 @@ class App extends React.Component {
         // }
         averageOrderTotal = (
           <DataBlock
-            label={"Average Order Total"}
+            label={'Average Order Total'}
             value={`$${(companyTotal / approvedOrders.length).toFixed(2)}`}
           />
         );
 
         //sort user spend data for display
-        userTotals = _.sortBy(userTotals, "total").reverse();
+        userTotals = _.sortBy(userTotals, 'total').reverse();
         //format user spend data for chart
         chartData = userTotals.map(user => {
           return { name: user.name, total: user.total };
         });
         tooltipContent = chartData.map(item => {
-          return { name: item.name, total: "$" + item.total.toFixed(2) };
+          return { name: item.name, total: '$' + item.total.toFixed(2) };
         });
         //update UI
         totalSpend = (
@@ -522,10 +523,10 @@ class App extends React.Component {
         );
         userData = userTotals.map((user, index) => {
           const textColor =
-            user.total <= this.state.maxSpend ? "green-text" : "red-text";
+            user.total <= this.state.maxSpend ? 'green-text' : 'red-text';
           return (
             <h3 key={index}>
-              {user.name}:{" "}
+              {user.name}:{' '}
               <span className={textColor}>${user.total.toFixed(2)}</span>
             </h3>
           );
@@ -534,7 +535,7 @@ class App extends React.Component {
         if (currentOrderData.order_id) {
           orderData = _.map(currentOrderData.products || {}, (item, index) => {
             //strip html and options from item description
-            let description = item.product.split("<", 1)[0];
+            let description = item.product.split('<', 1)[0];
             return (
               <TableRow key={index}>
                 <TableCell>{item.product_code}</TableCell>
@@ -556,7 +557,7 @@ class App extends React.Component {
             .map(item => item.products);
           userOrderData = _.map(userOrderData, (order, index) => {
             return _.map(order, (item, index) => {
-              let description = item.product.split("<", 1)[0];
+              let description = item.product.split('<', 1)[0];
               return (
                 <TableRow key={index}>
                   <TableCell>{item.product_code}</TableCell>
@@ -574,11 +575,11 @@ class App extends React.Component {
         userDetails = _.first(
           userTotals.filter(item => item.user_id === this.state.activeUser)
         );
-        const approveOrderData = orders.filter(o => o.status === "O");
+        const approveOrderData = orders.filter(o => o.status === 'O');
         modalData = currentOrderData.order_id ? orderData : userOrderData;
         modalTitle = currentOrderData.order_id
-          ? "Order #" + currentOrderData.order_id
-          : "Shopper Profile for " + (userDetails || {}).name;
+          ? 'Order #' + currentOrderData.order_id
+          : 'Shopper Profile for ' + (userDetails || {}).name;
 
         return (
           <Router>
@@ -625,17 +626,19 @@ class App extends React.Component {
           </Router>
         );
       } else {
+        setTimeout(() => this.setState({ takingTooLongToLoad: true }), 4000)
         return (
           <Grommet theme={theme}>
             <LoadingContainer>
               <LoadingSpinner size="xlarge" />
               <h1>Loading, please wait...</h1>
+              {this.state.takingTooLongToLoad && <p>taking too long? <button onClick={() => window.location.reload()}>Try again</button></p>}
             </LoadingContainer>
           </Grommet>
         );
       }
     } else {
-      lock.show();
+      this.state.lock.show();
       return null;
     }
   }
