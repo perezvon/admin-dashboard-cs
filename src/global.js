@@ -1,12 +1,12 @@
 /* eslint-disable */
-import _ from 'underscore'
+import _ from 'underscore';
 
 export function validateEmail(email) {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
 }
 
-export function getFilterFieldName (filter) {
+export function getFilterFieldName(filter) {
   switch (filter) {
     case '37':
       return 'Billing Code';
@@ -16,8 +16,8 @@ export function getFilterFieldName (filter) {
   }
 }
 
-export function getStoreID (username) {
-  switch(username) {
+export function getStoreID(username) {
+  switch (username) {
     case 'moorhead':
       return 5;
       break;
@@ -62,11 +62,14 @@ export function getStoreID (username) {
     case 'allinaems':
       return 13;
       break;
-    case 'northsecurity': 
+    case 'northsecurity':
       return 28;
       break;
-    case 'workhouse': 
+    case 'workhouse':
       return 29;
+      break;
+    case 'allinasecurity':
+      return 31;
       break;
     default:
       return 0;
@@ -74,7 +77,7 @@ export function getStoreID (username) {
 }
 
 export function currToNumber(string) {
-  return Number(string.replace(/[^0-9\.]+/g, ""))
+  return Number(string.replace(/[^0-9\.]+/g, ''));
 }
 
 export function sortCollection(collection, sortBy, reverseFlag) {
@@ -119,16 +122,16 @@ const NorthBillingCodes = {
   33: '8110 - Metro ALS',
   34: '8150 - Metro BLS',
   35: '8120 - Metro Wheelchair',
-  36: '8111 - Metro Admin.'
-}
+  36: '8111 - Metro Admin.',
+};
 
 export function getCompanyInfo(id) {
-  switch(id) {
+  switch (id) {
     case 5:
       return {
         companyName: 'Moorhead Fire',
         logo: 'moorheadlogo.png',
-        maxSpend: 500
+        maxSpend: 500,
       };
       break;
     case 6:
@@ -137,101 +140,107 @@ export function getCompanyInfo(id) {
         logo: 'northmemorial.png',
         maxSpend: 0,
         filter: '37',
-        filterFields: NorthBillingCodes
-      }
-      case 4:
-        return {
-          companyName: 'Anoka County Sheriff',
-          logo: 'anoka.png',
-          maxSpend: 0
-        }
-      case 7:
-        return {
-          companyName: 'St. Louis Park Fire',
-          logo: 'slpfire.jpg',
-          approve: true,
-          maxSpend: 0
-        }
-      case 8:
-        return {
-          companyName: 'Lake Johanna Fire',
-          logo: 'lakejofire.jpg',
-          maxSpend: 0
-        }
-      case 13:
-        return {
-          companyName: 'Allina EMS',
-          logo: 'allina.gif',
-          maxSpend: 0
-        }
-      case 14:
-        return {
-          companyName: 'Hennepin EMS',
-          logo: 'hennepinems.png',
-          maxSpend: 0
-        }
-      case 15:
-        return {
-          companyName: 'Minnetonka Police',
-          logo: 'minnetonkapolice.jpg',
-          approve: true,
-          maxSpend: 0
-        }
-      case 16:
-        return {
-          companyName: 'Chaska Fire Department',
-          logo: 'chaskafire.jpg',
-          maxSpend: 0
-        }
-      case 17:
-        return {
-          companyName: 'Air Guard Fire',
-          logo: 'airguard.jpg',
-          maxSpend: 0
-        }
-      case 18:
-        return {
-          companyName: 'Farmington Fire',
-          logo: 'farmingtonfire.jpg',
-          maxSpend: 0
-        }
-      case 20:
-        return {
-          companyName: 'Blaine Police Department',
-          logo: 'blainepd.png',
-          approve: true,
-          maxSpend: 0
-        }
-      case 21:
-        return {
-          companyName: 'Brooklyn Park Fire',
-          logo: 'bpfire.jpg',
-          maxSpend: 0
-        }
-      case 23:
-        return {
-          companyName: 'Inver Grove Heights Police Department',
-          logo: 'ighpd.jpg',
-          approve: true,
-          maxSpend: 0
-        }
-      case 28:
-        return {
-          companyName: 'North Memorial Security',
-          logo: 'northmemorial.png',
-          maxSpend: 0
-        }
-      case 29:
-        return {
-          companyName: 'Anoka County Corrections Workhouse',
-          logo: 'anokaworkhouse.jpg',
-          maxSpend: 0
-        }
+        filterFields: NorthBillingCodes,
+      };
+    case 4:
+      return {
+        companyName: 'Anoka County Sheriff',
+        logo: 'anoka.png',
+        maxSpend: 0,
+      };
+    case 7:
+      return {
+        companyName: 'St. Louis Park Fire',
+        logo: 'slpfire.jpg',
+        approve: true,
+        maxSpend: 0,
+      };
+    case 8:
+      return {
+        companyName: 'Lake Johanna Fire',
+        logo: 'lakejofire.jpg',
+        maxSpend: 0,
+      };
+    case 13:
+      return {
+        companyName: 'Allina EMS',
+        logo: 'allina.gif',
+        maxSpend: 0,
+      };
+    case 14:
+      return {
+        companyName: 'Hennepin EMS',
+        logo: 'hennepinems.png',
+        maxSpend: 0,
+      };
+    case 15:
+      return {
+        companyName: 'Minnetonka Police',
+        logo: 'minnetonkapolice.jpg',
+        approve: true,
+        maxSpend: 0,
+      };
+    case 16:
+      return {
+        companyName: 'Chaska Fire Department',
+        logo: 'chaskafire.jpg',
+        maxSpend: 0,
+      };
+    case 17:
+      return {
+        companyName: 'Air Guard Fire',
+        logo: 'airguard.jpg',
+        maxSpend: 0,
+      };
+    case 18:
+      return {
+        companyName: 'Farmington Fire',
+        logo: 'farmingtonfire.jpg',
+        maxSpend: 0,
+      };
+    case 20:
+      return {
+        companyName: 'Blaine Police Department',
+        logo: 'blainepd.png',
+        approve: true,
+        maxSpend: 0,
+      };
+    case 21:
+      return {
+        companyName: 'Brooklyn Park Fire',
+        logo: 'bpfire.jpg',
+        maxSpend: 0,
+      };
+    case 23:
+      return {
+        companyName: 'Inver Grove Heights Police Department',
+        logo: 'ighpd.jpg',
+        approve: true,
+        maxSpend: 0,
+      };
+    case 28:
+      return {
+        companyName: 'North Memorial Security',
+        logo: 'northmemorial.png',
+        maxSpend: 0,
+      };
+    case 29:
+      return {
+        companyName: 'Anoka County Corrections Workhouse',
+        logo: 'anokaworkhouse.jpg',
+        maxSpend: 0,
+      };
+    case 31:
+      return {
+        companyName: 'Allina Security',
+        logo: 'allina.gif',
+        maxSpend: 0,
+      };
     default:
       return {
         companyName: '',
         logo: '',
-        maxSpend: 0
+        maxSpend: 0,
       };
   }
 }
