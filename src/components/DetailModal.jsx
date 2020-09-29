@@ -1,6 +1,6 @@
-import React from "react";
-import { UserDetails } from "./UserDetails";
-import LoadingSpinner from "./components/LoadingSpinner";
+import React from 'react';
+import { UserDetails } from './UserDetails';
+import LoadingSpinner from './LoadingSpinner';
 import {
   Button,
   Layer,
@@ -9,9 +9,9 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Box
-} from "grommet";
-import styled from "styled-components";
+  Box,
+} from 'grommet';
+import styled from 'styled-components';
 
 const StyledLayer = styled(Layer)`
   padding: 20px 30px 30px 30px;
@@ -51,7 +51,7 @@ export const DetailModal = ({
   modalData,
   showModal,
   setShowModal,
-  userDetails
+  userDetails,
 }) =>
   showModal && (
     <StyledLayer
