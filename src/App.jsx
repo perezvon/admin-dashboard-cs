@@ -5,6 +5,8 @@ import { Grommet } from 'grommet';
 import './App.css';
 import Main from './components/Main';
 import { AuthProvider } from './hooks/useAuth';
+import { OrdersProvider } from './hooks/useOrders';
+import { FilterProvider } from './hooks/useFilter';
 import { User } from 'grommet-icons';
 
 //global grommet theming
@@ -22,13 +24,17 @@ const fromUrl = window.location.href || 'https://qm-dashboard.herokuapp.com';
 
 const App = () => (
   <AuthProvider>
-    <Router>
-      <Grommet theme={theme}>
-        <Switch>
-          <Route path="/" component={Main} />
-        </Switch>
-      </Grommet>
-    </Router>
+    <FilterProvider>
+      <OrdersProvider>
+        <Router>
+          <Grommet theme={theme}>
+            <Switch>
+              <Route path="/" component={Main} />
+            </Switch>
+          </Grommet>
+        </Router>
+      </OrdersProvider>
+    </FilterProvider>
   </AuthProvider>
 );
 

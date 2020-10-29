@@ -35,7 +35,7 @@ const useAuthProvider = () => {
     }
   }, []);
 
-  const showLogin = () => lock.show();
+  const showLogin = () => !localStorage.getItem('user') && lock.show();
 
   const logout = () => {
     lock.logout();

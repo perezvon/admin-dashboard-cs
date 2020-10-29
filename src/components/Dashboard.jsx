@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import moment from 'moment';
 import { Table } from './Table';
-import { UserSpendChart } from './UserSpendChart';
 import { Logo } from './Logo';
 import { DetailModal } from './DetailModal';
 import { FilterDropdown } from './FilterDropdown';
@@ -11,7 +10,10 @@ import { Logout } from 'grommet-icons';
 import styled from 'styled-components';
 
 import { useAuth } from '../hooks/useAuth';
-import useYear from '../hooks/useYear';
+import useFilter from '../hooks/useFilter';
+
+import SummaryData from './SummaryData';
+import Orders from './Orders';
 
 const StyledHeader = styled(Header)`
   padding: 0 20px;
@@ -22,18 +24,10 @@ const DashboardContainer = styled(Box)`
   min-height: 100vh;
 `;
 
-const PaddedSelectContainer = styled.div`
-  padding-left: 20px;
-`;
-
 const ResponsiveBox = styled(Box)`
   @media (max-width: 732px) {
     flex-flow: wrap;
   }
-`;
-
-const PaddedBox = styled(Box)`
-  padding: 20px;
 `;
 
 const StyledSelect = styled(Select)`
@@ -41,8 +35,11 @@ const StyledSelect = styled(Select)`
 `;
 
 export const Dashboard = () => {
-  const [showOrders, setShowOrders] = useState('all');
-  const { year, setYear } = useYear();
+  const {
+    state: { year, filterType },
+    setYear,
+    setFilterType,
+  } = useFilter();
   const {
     user: { logo, companyName },
     logout,
@@ -62,12 +59,12 @@ export const Dashboard = () => {
         <Box direction="row">
           <p>Filter by Year:</p>
           {yearSelect}
-          {/* {filter && dropdownItems.length > 0 && <p>{filter}</p>}
-          {filter && dropdownItems.length > 0 && (
+          {/* {filterType && dropdownItems.length > 0 && <p>{filterType}</p>}
+          {filterType && dropdownItems.length > 0 && (
             <FilterDropdown
-              filter={filter}
+              filter={filterType}
               dropdownItems={dropdownItems}
-              handleFilter={handleFilter}
+              handleFilter={setFilterType}
             />
           )} */}
         </Box>
@@ -77,53 +74,12 @@ export const Dashboard = () => {
         <div>
           <Tabs id="qm-tabs" style={{ marginTop: '20px' }}>
             <Tab title="Summary">
-              {userData && (
-                <div>
-                  <Box>
-                    <ResponsiveBox direction="row" align="center">
-                      <Box direction="row" wrap={true} justify="center">
-                        {totalSpend}
-                        {spendRemaining}
-                        {totalOrders}
-                        {averageOrderTotal}
-                      </Box>
-                      <UserSpendChart
-                        chartData={chartData}
-                        tooltipContent={tooltipContent}
-                      />
-                    </ResponsiveBox>
-                  </Box>
-                </div>
-              )}
+              <SummaryData />
             </Tab>
             <Tab title="Orders">
-              <PaddedSelectContainer>
-                <p>View by:</p>
-                <StyledSelect
-                  value={showOrders}
-                  onChange={({ option }) => setShowOrders(option)}
-                  options={['all', 'employee']}
-                  placeholder="select"
-                />
-              </PaddedSelectContainer>
-              <PaddedBox>
-                {showOrders === 'employee' && (
-                  <Table headers={userHeaders} tableData={userSpendData} />
-                )}
-                {showOrders === 'all' && (
-                  <Table headers={headers} tableData={tableData} />
-                )}
-              </PaddedBox>
-              <DetailModal
-                modalTitle={modalTitle}
-                modalData={modalData}
-                userDetails={userDetails}
-                showModal={showModal}
-                setShowModal={setShowModal}
-                modalLoading={modalLoading}
-              />
+              <Orders />
             </Tab>
-            {approve && (
+            {/* {approve && (
               <Tab title="Approve/Deny Orders">
                 <ApproveDeny
                   data={orderData}
@@ -137,7 +93,7 @@ export const Dashboard = () => {
                   setActiveOrder={setActiveOrder}
                 />
               </Tab>
-            )}
+            )} */}
           </Tabs>
         </div>
       </DashboardContainer>
