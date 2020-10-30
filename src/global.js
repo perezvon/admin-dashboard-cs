@@ -71,6 +71,9 @@ export function getStoreID(username) {
     case 'allinasecurity':
       return 31;
       break;
+    case 'goldenvalleypd':
+      return 36;
+      break;
     default:
       return 0;
   }
@@ -234,6 +237,12 @@ export function getCompanyInfo(id) {
       return {
         companyName: 'Allina Security',
         logo: 'allina.gif',
+        maxSpend: 0,
+      };
+    case 36:
+      return {
+        companyName: 'Golden Valley PD',
+        logo: 'gvpd.jpg',
         maxSpend: 0,
       };
     default:
