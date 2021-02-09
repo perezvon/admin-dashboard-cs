@@ -74,6 +74,9 @@ export function getStoreID(username) {
     case 'goldenvalleypd':
       return 36;
       break;
+    case 'coonrapidsfire':
+      return 39;
+      break;
     default:
       return 0;
   }
@@ -243,6 +246,12 @@ export function getCompanyInfo(id) {
       return {
         companyName: 'Golden Valley PD',
         logo: 'gvpd.jpg',
+        maxSpend: 0,
+      };
+    case 39:
+      return {
+        companyName: 'Coon Rapids Fire Department',
+        logo: 'crfd.jpg',
         maxSpend: 0,
       };
     default:
