@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import moment from "moment";
-import { Table } from "./components/Table";
-import { UserSpendChart } from "./UserSpendChart";
-import { Logo } from "./Logo";
-import { DetailModal } from "./DetailModal";
-import { FilterDropdown } from "./components/FilterDropdown";
-import ApproveDeny from "./ApproveDeny";
-import { Header, Grid, Button, Tabs, Tab, Box, Select } from "grommet";
-import { Logout } from "grommet-icons";
-import styled from "styled-components";
+import React, { useState } from 'react';
+import moment from 'moment';
+import { Table } from './components/Table';
+import { UserSpendChart } from './UserSpendChart';
+import { Logo } from './Logo';
+import { DetailModal } from './DetailModal';
+import { FilterDropdown } from './components/FilterDropdown';
+import ApproveDeny from './ApproveDeny';
+import { Header, Grid, Button, Tabs, Tab, Box, Select } from 'grommet';
+import { Logout } from 'grommet-icons';
+import styled from 'styled-components';
 
 const StyledHeader = styled(Header)`
   padding: 0 20px;
@@ -66,15 +66,15 @@ export const Dashboard = ({
   handleYear,
   approveOrDenyOrders,
   setActiveOrder,
-  logout
+  logout,
 }) => {
-  const [showOrders, setShowOrders] = useState("all");
-  const formattedYear = year === "all" ? year : moment(year).format("YYYY");
+  const [showOrders, setShowOrders] = useState('all');
+  const formattedYear = year === 'all' ? year : moment(year).format('YYYY');
   const yearSelect = (
     <StyledSelect
       value={formattedYear}
       onChange={({ option }) => handleYear(option)}
-      options={["all", 2020, 2019, 2018]}
+      options={['all', 2021, 2020, 2019, 2018]}
       placeholder="select"
     />
   );
@@ -99,7 +99,7 @@ export const Dashboard = ({
       </StyledHeader>
       <DashboardContainer>
         <div>
-          <Tabs id="qm-tabs" style={{ marginTop: "20px" }}>
+          <Tabs id="qm-tabs" style={{ marginTop: '20px' }}>
             <Tab title="Summary">
               {userData && (
                 <div>
@@ -126,15 +126,15 @@ export const Dashboard = ({
                 <StyledSelect
                   value={showOrders}
                   onChange={({ option }) => setShowOrders(option)}
-                  options={["all", "employee"]}
+                  options={['all', 'employee']}
                   placeholder="select"
                 />
               </PaddedSelectContainer>
               <PaddedBox>
-                {showOrders === "employee" && (
+                {showOrders === 'employee' && (
                   <Table headers={userHeaders} tableData={userSpendData} />
                 )}
-                {showOrders === "all" && (
+                {showOrders === 'all' && (
                   <Table headers={headers} tableData={tableData} />
                 )}
               </PaddedBox>
