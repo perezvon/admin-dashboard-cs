@@ -38,6 +38,20 @@ const theme = {
       height: '20px',
     },
   },
+  table: {
+    body: {
+      border: 'horizontal',
+    },
+    header: {
+      border: 'bottom',
+      fill: 'horizontal',
+      verticalAlign: 'bottom',
+      background: {
+        color: 'accent-1',
+        opacity: 'strong',
+      },
+    },
+  },
 };
 
 const fromUrl = window.location.href || 'https://qm-dashboard.herokuapp.com';
@@ -74,20 +88,22 @@ class App extends React.Component {
       ),
       token: localStorage.getItem('accessToken'),
       username: localStorage.getItem('username'),
-      currentId: getStoreID(localStorage.getItem('username'))
+      currentId: getStoreID(localStorage.getItem('username')),
     };
   }
 
-  setActiveOrder = e => {
+  setActiveOrder = (e) => {
     e.preventDefault();
-    const order = e.target.attributes.getNamedItem('data-order') ? e.target.attributes.getNamedItem('data-order').value : e.target.parentNode.attributes.getNamedItem('data-order').value;
+    const order = e.target.attributes.getNamedItem('data-order')
+      ? e.target.attributes.getNamedItem('data-order').value
+      : e.target.parentNode.attributes.getNamedItem('data-order').value;
     this.asyncGetOrderDetails(order);
     this.setState({
       activeUser: 0,
     });
   };
 
-  setActiveUser = e => {
+  setActiveUser = (e) => {
     e.preventDefault();
     const user = e.target.parentNode.attributes.getNamedItem('data-user').value;
     this.setState({
@@ -97,16 +113,16 @@ class App extends React.Component {
     });
   };
 
-  setShowModal = val => this.setState({ showModal: val });
+  setShowModal = (val) => this.setState({ showModal: val });
 
-  getWalletBalance = user => {
+  getWalletBalance = (user) => {
     let userBalance = this.state.data
-      .filter(d => d.user_id === user)
+      .filter((d) => d.user_id === user)
       .sort((a, b) => b.timestamp - a.timestamp);
     return userBalance[0] ? userBalance[0].wallet : null;
   };
 
-  sortFactor = e => {
+  sortFactor = (e) => {
     e.preventDefault();
     const sort = e.target.attributes.getNamedItem('data-sort').value;
     let reverseValue = this.state.reverse;
@@ -175,13 +191,13 @@ class App extends React.Component {
     });
   };
 
-  handleFilter = eventKey => {
+  handleFilter = (eventKey) => {
     if (eventKey !== 'all') {
-      this.setState(prevState => {
+      this.setState((prevState) => {
         return {
           filterBy: eventKey,
           filteredData: prevState.orders.filter(
-            i => i.fields[prevState.filter] === eventKey
+            (i) => i.fields[prevState.filter] === eventKey
           ),
         };
       });
@@ -192,12 +208,12 @@ class App extends React.Component {
       });
   };
 
-  handleYear = year => {
+  handleYear = (year) => {
     if (year !== 'all') {
       const formattedYear = moment(`01/01/${year}`);
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         year: formattedYear,
-        filteredData: prevState.orders.filter(d =>
+        filteredData: prevState.orders.filter((d) =>
           moment.unix(+d.timestamp).isSame(formattedYear, 'year')
         ),
       }));
@@ -208,7 +224,7 @@ class App extends React.Component {
       });
   };
 
-  approveOrDenyOrders = data => {
+  approveOrDenyOrders = (data) => {
     fetch('/api/approve-deny', {
       body: JSON.stringify(data),
       cache: 'no-cache',
@@ -219,34 +235,34 @@ class App extends React.Component {
       method: 'POST',
       mode: 'same-origin',
     })
-      .then(res => res.json())
-      .then(json => {
+      .then((res) => res.json())
+      .then((json) => {
         alert('Order Statuses Updated!');
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   };
 
-  asyncGetOrderDetails = order_id => {
+  asyncGetOrderDetails = (order_id) => {
     this.setState({
       showModal: true,
       modalLoading: true,
     });
     fetch(`/api/orders/${this.state.currentId}/${order_id}`)
-      .then(res => res.json())
-      .then(json => {
+      .then((res) => res.json())
+      .then((json) => {
         this.setState({
           currentOrderData: json,
           modalLoading: false,
         });
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
       });
   };
 
   componentDidMount = () => {
     const { lock, token, currentId } = this.state;
-    
+
     lock.on('authenticated', (authResult) => {
       // Use the token in authResult to getUserInfo() and save it to localStorage
       lock.getUserInfo(authResult.accessToken, (error, profile) => {
@@ -260,7 +276,7 @@ class App extends React.Component {
         localStorage.setItem('profile', profile.app_metadata);
       });
     });
-    
+
     if (token) {
       let shouldFetchUpdates = false;
       if (
@@ -280,8 +296,8 @@ class App extends React.Component {
         return this.handleYear(this.state.year.format('YYYY'));
       }
       fetch(`/api/orders/${currentId}`)
-        .then(res => res.json())
-        .then(json => {
+        .then((res) => res.json())
+        .then((json) => {
           let orderData = json.orders;
           this.setState({
             orders: orderData,
@@ -295,12 +311,11 @@ class App extends React.Component {
           );
           this.handleYear(this.state.year.format('YYYY'));
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
           this.setState({ apiError: true });
         });
     }
-    
   };
 
   render() {
@@ -350,10 +365,10 @@ class App extends React.Component {
         const selectedYear =
           year === 'all' ? year : moment(year).format('YYYY');
         let approvedOrders = this.state.approve
-          ? filteredData.filter(i => i.status === 'P')
-          : filteredData.filter(i => i.status !== 'I');
+          ? filteredData.filter((i) => i.status === 'P')
+          : filteredData.filter((i) => i.status !== 'I');
         //populate orders array
-        approvedOrders.forEach(order => {
+        approvedOrders.forEach((order) => {
           let {
             order_id,
             user_id,
@@ -379,8 +394,8 @@ class App extends React.Component {
         dropdownItems = [
           ...new Set(
             data
-              .map(item => item.fields[this.state.filter])
-              .filter(item => !!item)
+              .map((item) => item.fields[this.state.filter])
+              .filter((item) => !!item)
               .sort((a, b) => +a - +b)
           ),
         ];
@@ -390,15 +405,15 @@ class App extends React.Component {
 
         //get unique users && create dataset for each
         const uniqueUsers = [
-          ...new Set(approvedOrders.map(item => item.user_id)),
+          ...new Set(approvedOrders.map((item) => item.user_id)),
         ];
         totalSpendRemaining = 0;
 
-        uniqueUsers.forEach(user => {
+        uniqueUsers.forEach((user) => {
           let userWallet = this.getWalletBalance(user) || 0;
           //console.log(userWallet)
           let approvedOrdersForUser = approvedOrders.filter(
-            i => i.user_id === user
+            (i) => i.user_id === user
           );
           const userName =
             approvedOrdersForUser && approvedOrdersForUser[0].firstname
@@ -502,10 +517,10 @@ class App extends React.Component {
         //sort user spend data for display
         userTotals = _.sortBy(userTotals, 'total').reverse();
         //format user spend data for chart
-        chartData = userTotals.map(user => {
+        chartData = userTotals.map((user) => {
           return { name: user.name, total: user.total };
         });
-        tooltipContent = chartData.map(item => {
+        tooltipContent = chartData.map((item) => {
           return { name: item.name, total: '$' + item.total.toFixed(2) };
         });
         //update UI
@@ -551,10 +566,10 @@ class App extends React.Component {
         //get data for current customer
         if (this.state.activeUser) {
           userOrderData = approvedOrders
-            .filter(order => {
+            .filter((order) => {
               return +order.user_id === this.state.activeUser;
             })
-            .map(item => item.products);
+            .map((item) => item.products);
           userOrderData = _.map(userOrderData, (order, index) => {
             return _.map(order, (item, index) => {
               let description = item.product.split('<', 1)[0];
@@ -573,9 +588,9 @@ class App extends React.Component {
           });
         }
         userDetails = _.first(
-          userTotals.filter(item => item.user_id === this.state.activeUser)
+          userTotals.filter((item) => item.user_id === this.state.activeUser)
         );
-        const approveOrderData = orders.filter(o => o.status === 'O');
+        const approveOrderData = orders.filter((o) => o.status === 'O');
         modalData = currentOrderData.order_id ? orderData : userOrderData;
         modalTitle = currentOrderData.order_id
           ? 'Order #' + currentOrderData.order_id
@@ -626,13 +641,20 @@ class App extends React.Component {
           </Router>
         );
       } else {
-        setTimeout(() => this.setState({ takingTooLongToLoad: true }), 4000)
+        setTimeout(() => this.setState({ takingTooLongToLoad: true }), 4000);
         return (
           <Grommet theme={theme}>
             <LoadingContainer>
               <LoadingSpinner size="xlarge" />
               <h1>Loading, please wait...</h1>
-              {this.state.takingTooLongToLoad && <p>taking too long? <button onClick={() => window.location.reload()}>Try again</button></p>}
+              {this.state.takingTooLongToLoad && (
+                <p>
+                  taking too long?{' '}
+                  <button onClick={() => window.location.reload()}>
+                    Try again
+                  </button>
+                </p>
+              )}
             </LoadingContainer>
           </Grommet>
         );

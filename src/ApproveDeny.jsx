@@ -1,9 +1,17 @@
-import React from "react";
-import { Table } from "./components/Table";
-import { TextArea, TableRow, TableCell } from "grommet";
-import { DetailModal } from "./DetailModal";
-import { Button } from "grommet";
+import React from 'react';
+import { Table } from './components/Table';
+import { TextArea, TableRow, TableCell } from 'grommet';
+import { DetailModal } from './DetailModal';
+import { Button } from 'grommet';
+import styled from 'styled-components';
 
+const ApproveDenyContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+`;
 export default class ApproveDeny extends React.Component {
   constructor(props) {
     super(props);
@@ -12,33 +20,33 @@ export default class ApproveDeny extends React.Component {
 
   componentWillReceiveProps(props) {
     this.setState({
-      ...props
+      ...props,
     });
   }
   handleInput = (e, index) => {
     let field, value;
-    if (e.target.type === "checkbox") {
-      field = "approved";
+    if (e.target.type === 'checkbox') {
+      field = 'approved';
       value = e.target.checked;
     } else {
-      field = "approve_deny_notes";
+      field = 'approve_deny_notes';
       value = e.target.value;
     }
     const newData = this.state.data;
     newData[index] = { ...this.state.data[index], [field]: value };
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
-      data: newData
+      data: newData,
     }));
   };
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
     let data = [];
-    this.state.data.forEach(o => {
-      if (o.approved) o.status = "P";
+    this.state.data.forEach((o) => {
+      if (o.approved) o.status = 'P';
       if (!o.approved) {
         o.approved = false;
-        o.status = "D";
+        o.status = 'D';
       }
       data.push(o);
     });
@@ -56,24 +64,33 @@ export default class ApproveDeny extends React.Component {
       showModal,
       setShowModal,
       modalLoading,
-      setActiveOrder
+      setActiveOrder,
     } = this.state;
-    const headers = ["Order", "Name", "Total", "Approved?", "Notes"].map(i => (
-      <td>{i}</td>
-    ));
+    const headers = [
+      'Order',
+      'Name',
+      'Total',
+      'Approved?',
+      'Notes',
+    ].map((i) => <TableCell>{i}</TableCell>);
     const tableData = data.map((i, index) => (
       <TableRow key={i.order_id}>
-        <TableCell onClick={setActiveOrder} data-order={i.order_id}>{i.order_id}</TableCell>
         <TableCell onClick={setActiveOrder} data-order={i.order_id}>
-          {i.b_firstname ? i.b_firstname + " " + i.b_lastname : i.email}
+          {i.order_id}
         </TableCell>
-        <TableCell onClick={setActiveOrder} data-order={i.order_id}>{`$${i.total}`}</TableCell>
+        <TableCell onClick={setActiveOrder} data-order={i.order_id}>
+          {i.b_firstname ? i.b_firstname + ' ' + i.b_lastname : i.email}
+        </TableCell>
+        <TableCell
+          onClick={setActiveOrder}
+          data-order={i.order_id}
+        >{`$${i.total}`}</TableCell>
         <TableCell>
           <label className="switch">
             <input
               type="checkbox"
               checked={i.approved}
-              onChange={e => this.handleInput(e, index)}
+              onChange={(e) => this.handleInput(e, index)}
             />
             <span className="slider round"></span>
           </label>
@@ -82,16 +99,21 @@ export default class ApproveDeny extends React.Component {
           <TextArea
             placeholder="Enter notes for employee here (optional)"
             value={i.approve_deny_notes}
-            onChange={e => this.handleInput(e, index)}
+            onChange={(e) => this.handleInput(e, index)}
           ></TextArea>
         </TableCell>
       </TableRow>
     ));
     if (data.length > 0) {
       return (
-        <div>
+        <ApproveDenyContainer>
           <Table headers={headers} tableData={tableData} />
-          <Button onClick={this.handleSubmit}>Submit</Button>
+          <Button
+            primary
+            size="large"
+            onClick={this.handleSubmit}
+            label="Submit"
+          />
           <DetailModal
             modalTitle={modalTitle}
             modalData={modalData}
@@ -100,7 +122,7 @@ export default class ApproveDeny extends React.Component {
             modalLoading={modalLoading}
             setShowModal={setShowModal}
           />
-        </div>
+        </ApproveDenyContainer>
       );
     } else {
       return <h3>No Orders to Approve!</h3>;

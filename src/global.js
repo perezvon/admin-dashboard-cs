@@ -77,6 +77,9 @@ export function getStoreID(username) {
     case 'coonrapidsfire':
       return 39;
       break;
+    case 'maplewoodfire':
+      return 19;
+      break;
     default:
       return 0;
   }
@@ -252,6 +255,13 @@ export function getCompanyInfo(id) {
       return {
         companyName: 'Coon Rapids Fire Department',
         logo: 'crfd.jpg',
+        maxSpend: 0,
+      };
+    case 19:
+      return {
+        companyName: 'Maplewood Fire',
+        logo: 'maplewoodfd.jpg',
+        approve: true,
         maxSpend: 0,
       };
     default:

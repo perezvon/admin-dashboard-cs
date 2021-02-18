@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 import {
   Table as GrommetTable,
   TableHeader,
   TableBody,
-  TableRow
-} from "grommet";
+  TableRow,
+} from 'grommet';
 
 export const Table = ({ headers, tableData }) => (
-  <GrommetTable>
+  <GrommetTable border="horizontal">
     <TableHeader>
       <TableRow>{headers}</TableRow>
     </TableHeader>

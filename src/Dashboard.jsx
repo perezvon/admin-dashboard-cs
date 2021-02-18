@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { Table } from './components/Table';
 import { UserSpendChart } from './UserSpendChart';
@@ -37,6 +37,17 @@ const StyledSelect = styled(Select)`
   max-width: 300px;
 `;
 
+const StyledTabs = styled(Tabs)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+`;
+
+const StyledTab = styled(Tab)`
+  margin-top: 20px;
+`;
+
 export const Dashboard = ({
   logo,
   companyName,
@@ -69,6 +80,9 @@ export const Dashboard = ({
   logout,
 }) => {
   const [showOrders, setShowOrders] = useState('all');
+  const [activeTab, setActiveTab] = useState(
+    approve && orderData.length > 0 ? 2 : 0
+  );
   const formattedYear = year === 'all' ? year : moment(year).format('YYYY');
   const yearSelect = (
     <StyledSelect
@@ -78,7 +92,12 @@ export const Dashboard = ({
       placeholder="select"
     />
   );
-  // const activeKey = orderData.length > 0 ? 2 : 1;
+  useEffect(() => {
+    console.log('approve', approve);
+    console.log(orderData.filter(({ status }) => status === 'O').length);
+  }, []);
+
+  const updateActiveTab = (nextIndex) => setActiveTab(nextIndex);
   return (
     <Grid>
       <StyledHeader>
@@ -99,8 +118,12 @@ export const Dashboard = ({
       </StyledHeader>
       <DashboardContainer>
         <div>
-          <Tabs id="qm-tabs" style={{ marginTop: '20px' }}>
-            <Tab title="Summary">
+          <StyledTabs
+            id="qm-tabs"
+            activeIndex={activeTab}
+            onActive={updateActiveTab}
+          >
+            <StyledTab title="Summary">
               {userData && (
                 <div>
                   <Box>
@@ -119,8 +142,8 @@ export const Dashboard = ({
                   </Box>
                 </div>
               )}
-            </Tab>
-            <Tab title="Orders">
+            </StyledTab>
+            <StyledTab title="Orders">
               <PaddedSelectContainer>
                 <p>View by:</p>
                 <StyledSelect
@@ -146,9 +169,9 @@ export const Dashboard = ({
                 setShowModal={setShowModal}
                 modalLoading={modalLoading}
               />
-            </Tab>
+            </StyledTab>
             {approve && (
-              <Tab title="Approve/Deny Orders">
+              <StyledTab title="Approve/Deny Orders" tabstyle>
                 <ApproveDeny
                   data={orderData}
                   approveOrDenyOrders={approveOrDenyOrders}
@@ -160,9 +183,9 @@ export const Dashboard = ({
                   modalLoading={modalLoading}
                   setActiveOrder={setActiveOrder}
                 />
-              </Tab>
+              </StyledTab>
             )}
-          </Tabs>
+          </StyledTabs>
         </div>
       </DashboardContainer>
     </Grid>
