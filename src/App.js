@@ -17,6 +17,14 @@ import DataBlock from './components/DataBlock';
 import LoadingSpinner from './components/LoadingSpinner';
 import styled from 'styled-components';
 
+const statusStringMap = {
+  O: 'Open',
+  P: 'Approved',
+  D: 'Denied',
+  I: 'Canceled',
+  Y: 'Approval Needed',
+};
+
 const ClickableTableRow = styled(TableRow)`
   cursor: pointer;
   &:hover {
@@ -370,6 +378,7 @@ class App extends React.Component {
         //populate orders array
         approvedOrders.forEach((order) => {
           let {
+            status,
             order_id,
             user_id,
             timestamp,
@@ -381,13 +390,15 @@ class App extends React.Component {
           let orderNumber = order_id;
           let date = moment.unix(timestamp).format('MMMM DD, YYYY');
           let name = firstname ? `${firstname} ${lastname}` : email;
-          total = +total;
+          total = (+total || 0).toFixed(2);
+          const statusString = statusStringMap[status] || 'Unknown';
           orderTotals.push({
             user_id,
             orderNumber,
             date,
             name,
             total,
+            statusString,
           });
         });
         //filter menu dropdown items
@@ -452,13 +463,17 @@ class App extends React.Component {
           this.state.reverse
         );
         //format orders for order table
-        headers = ['Order Number', 'Order Date', 'Employee', 'Total'].map(
-          (item, index) => (
-            <TableCell key={index} data-sort={item} onClick={this.sortFactor}>
-              {item}
-            </TableCell>
-          )
-        );
+        headers = [
+          'Order Number',
+          'Order Date',
+          'Employee',
+          'Total',
+          'Order Status',
+        ].map((item, index) => (
+          <TableCell key={index} data-sort={item} onClick={this.sortFactor}>
+            {item}
+          </TableCell>
+        ));
         tableData = sortedOrders.map((item, index) => {
           return (
             <ClickableTableRow
